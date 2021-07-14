@@ -1,0 +1,8 @@
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.18",
+        "phpoffice/phpexcel": "^1.8",
+        "twig/twig": "^3.3",
+        "twig/intl-extra": "^3.3"
+    }
+}
