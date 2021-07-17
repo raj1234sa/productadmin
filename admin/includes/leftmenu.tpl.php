@@ -5,6 +5,12 @@ $AdminSectionMaster->setOrderBy("sort_order ASC");
 $adminSectionData = $AdminSectionMaster->getAdminSection('yes');
 
 $finalLeftMenuData = array();
+$finalLeftMenuData[-1] = array(
+    'section_id' => 0,
+    'section_title' => COMMON_DASHBOARD,
+    'section_icon' => 'ti-dashboard',
+    'section_url' => DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME,
+);
 foreach ($adminSectionData as $key => $value) {
     $AdminMenuMaster = new AdminMenuMaster();
     $AdminMenuMaster->setOrderBy("sort_order ASC");
@@ -12,15 +18,10 @@ foreach ($adminSectionData as $key => $value) {
     $AdminMenuMaster->setWhere('AND section_id = :section_id', $value['section_id'], 'int');
     $adminMenuData = $AdminMenuMaster->getAdminMenu('yes');
 
-    $section_url = '';
-    if($value['section_heading'] == COMMON_DASHBOARD && empty($adminMenuData)) {
-        $section_url = DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME;
-    }
     $finalLeftMenuData[$key] = array(
         'section_id' => $value['section_id'],
         'section_title' => $value['section_heading'],
         'section_icon' => $value['icon_class'],
-        'section_url' => $section_url,
         'children' => array(),
     );
 
@@ -33,11 +34,19 @@ foreach ($adminSectionData as $key => $value) {
         );
     }
 }
+
+if(defined('SITE_LOGO') && SITE_LOGO == '') {
+    $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WEBSITE_LOGOS."' class='btn btn-primary'>Upload Logo Here</a>";
+} else {
+    $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME."'><img src='".SITE_LOGO."' alt='logo'></a>";
+}
+// echo '<pre>'; print_r($finalLeftMenuData); echo '</pre>'; exit;
 ?>
 <div class="sidebar-menu">
     <div class="sidebar-header">
         <div class="logo">
-            <a href="index.html"><img src="assets/images/icon/logo.png" alt="logo"></a>
+            <?php echo $logo_text; ?>
+            
         </div>
     </div>
     <div class="main-menu">
@@ -73,7 +82,7 @@ foreach ($adminSectionData as $key => $value) {
                                 foreach ($menuData as $menu) {
                                     $menuUrl = $menu['action_page'];
                                     $menuTitle = $menu['menu_title'];
-                                    $menu_active_class = ($section_active && ADMIN_PAGE_ID == $menu['page_id']) ? 'active' : '';
+                                    $menu_active_class = ($section_active && in_array($menu['page_id'], ADMIN_ALLOWED_PAGE_ID)) ? 'active' : '';
 
                                     if(!empty($menuUrl)) {
                                         $menuUrl = DIR_HTTP_ADMIN.$menuUrl;

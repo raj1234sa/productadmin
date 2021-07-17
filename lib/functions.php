@@ -103,9 +103,54 @@ function requestValue($name, $default='') {
     }
 }
 
+function fileValue($name, $default='') {
+    if(isset($_FILES[$name])) {
+        return $_FILES[$name];
+    } else {
+        return $default;
+    }
+    // return (isset($_FILES[$name]) && !empty($_FILES[$name])) ? $_FILES[$name]['name'] : $default;
+}
+
 function show_page_header($url) {
     header("Location: ".$url);
     exit;
+}
+
+function generateFileName($filename) {
+    $filename = str_replace(' ', '_', $filename);
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    $filename = pathinfo($filename, PATHINFO_FILENAME);
+    $return_filename = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $filename).time().'.'.$ext;
+    return $return_filename;
+}
+
+
+
+function uploadFiles($destination, $element) {
+    if(!empty($element)) {
+        if(!empty($element)) {
+            $target_dir = $destination;
+            $target_file = $target_dir . basename($element["name"]);
+            if (move_uploaded_file($element["tmp_name"], $target_file)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
+function getWebsiteLogos() {
+    require_once(DIR_WS_MODEL.'WebsiteLogosMaster.php');
+
+    $objWebsiteLogosMaster = new WebsiteLogosMaster();
+    $wLogosData = $objWebsiteLogosMaster->getWebsiteLogos();
+    if(!empty($wLogosData)) {
+        $wLogosData = $wLogosData[0];
+    }
+    return $wLogosData;
 }
 
 ?>

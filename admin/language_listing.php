@@ -54,7 +54,7 @@ if($is_ajax_request && ($listing_data || $export)) {
     $totalRecordCount = 0;
     if(!empty($siteLanguages)) {
         $totalRecordCount = $siteLanguages->FoundRows();
-        $sr = $search['start'] + 1;
+        $sr = $SC_start + 1;
         foreach ($siteLanguages as $lang) {
             $rec = array();
             $flag_name = (!empty($lang['language_flag'])) ? $lang['language_flag'] : '';
@@ -97,6 +97,10 @@ if($is_ajax_request && ($listing_data || $export)) {
 
 $breadcrumb_arr = array(
     $breadcrumb_home,
+    array(
+        'title' => $page_title,
+        // 'link' => DIR_HTTP_ADMIN.FILE_ADMIN_USER_LISTING
+    ),
 );
 
 $action_buttons = array();

@@ -8,19 +8,21 @@ $admin_js_arr['global'] = array(
     DIR_HTTP_THIRDPARTY_JS.'jquery.slimscroll.min.js',
     DIR_HTTP_THIRDPARTY_JS.'jquery.slicknav.min.js',
     DIR_HTTP_THIRDPARTY_JS.'plugins.js',
+    DIR_HTTP_THIRDPARTY_JS.'jquery.cookie.min.js',
     DIR_HTTP_THIRDPARTY_JS.'scripts.js',
     DIR_HTTP_THIRDPARTY_JS.'jquery.dataTables.js',
     DIR_HTTP_ADMIN_JS.'admin.js',
+    DIR_HTTP_THIRDPARTY_JS.'image-zoom.min.js',
 );
 
 function addJs($admin_js_arr) {
     foreach ($admin_js_arr['global'] as $value) {
         echo "<script src='".$value."?".time()."'></script>";
     }
-    echo "<script>";
-    foreach (get_defined_constants(true)['user'] as $key => $value) {
-        // echo "var ".$key." = '".$value."';";
-    }
-    echo "</script>";
+    // echo "<script>";
+    // foreach (get_defined_constants(true)['user'] as $key => $value) {
+    //     echo "var ".$key." = '".$value."';";
+    // }
+    // echo "</script>";
 }
 ?>

@@ -3,22 +3,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-function createAdminConstants() {
-    require_once(DIR_WS_MODEL.'AdminConstantsMaster.php');
-    $adminConstantsMaster = new AdminConstantsMaster();
-
-    $adminConstantsMaster->setSelect('admin_constants.constant_name, admin_constants_description.constant_value');
-    $adminConstantsMaster->setWhere('AND (section_menu_id = :section_menu_id', ADMIN_SECTION_ID, 'int');
-    $adminConstantsMaster->setWhere('OR section_menu_id = :section_menu_id_1)', 0, 'int');
-    $constantsData = $adminConstantsMaster->getAdminConstants('yes');
-
-    if(!empty($constantsData)) {
-        foreach ($constantsData as $value) {
-            define($value['constant_name'], $value['constant_value']);
-        }
-    }
-}
-
 function defineAccessData() {
     require_once(DIR_WS_MODEL.'AdminMenuMaster.php');
     require_once(DIR_WS_MODEL.'AdminSectionMaster.php');
@@ -28,40 +12,54 @@ function defineAccessData() {
     if(FILE_FILENAME_WITHOUT_EXT != 'index') {
         $AdminPagesMaster->setWhere("AND page_name = :page_name", FILE_FILENAME_WITH_EXT, 'string');
         $pageData = $AdminPagesMaster->getAdminPage();
-        if(empty($pageData)) { echo 'Page not available'; exit; }
+        if(empty($pageData)) { define('ADMIN_PAGE_ID', 0);}
         $pageData = $pageData[0];
         define('ADMIN_PAGE_ID', $pageData['page_id']);
     } else {
         define('ADMIN_PAGE_ID', 0);
     }
 
-    $AdminSectionMaster = new AdminSectionMaster();
     global $page_title;
-    if(defined('ADMIN_PAGE_ID') && ADMIN_PAGE_ID > 0) {
-        $AdminSectionMaster->setWhere('AND FIND_IN_SET(page_ids, "'.ADMIN_PAGE_ID.'") > 0', '', '');
-        $adminSectionData = $AdminSectionMaster->getAdminSection('yes');
-        if(empty($adminSectionData)) { define('ADMIN_SECTION_ID', 0); }
-        else {
-            $adminSectionData = $adminSectionData[0];
-            $page_title = $adminSectionData['section_heading'];
-            define('ADMIN_SECTION_ID', $adminSectionData['section_id']);
-        }
-    } else {
-        define('ADMIN_SECTION_ID', 0);
+    if(FILE_FILENAME_WITHOUT_EXT == 'welcome') {
+        $page_title = 'Dashboard';
     }
-
+    $allowed_pages = array();
     $AdminMenuMaster = new AdminMenuMaster();
-    if(defined('ADMIN_SECTION_ID') && ADMIN_SECTION_ID > 0) {
-        $AdminMenuMaster->setWhere('AND section_id = :section_id', ADMIN_SECTION_ID, 'int');
+    if(defined('ADMIN_PAGE_ID') && ADMIN_PAGE_ID > 0) {
+        $AdminMenuMaster->setWhere('AND FIND_IN_SET("'.ADMIN_PAGE_ID.'", page_ids) > 0', '', 'string');
+        $AdminMenuMaster->setJoin('LEFT JOIN admin_section ON admin_section.section_id = admin_section_menu.section_id');
+        $AdminMenuMaster->setJoin('LEFT JOIN admin_section_description ON admin_section_description.section_id = admin_section.section_id');
         $adminMenuData = $AdminMenuMaster->getAdminMenu('yes');
-        if(empty($adminMenuData) && $page_title == 'Dashboard') { define('ADMIN_MENU_ID', 0); }
+        if(empty($adminMenuData)) { define('ADMIN_MENU_ID', 0); define('ADMIN_SECTION_ID', 0); }
         elseif(!empty($adminMenuData)) {
             $adminMenuData = $adminMenuData[0];
+            $allowed_pages = explode(',', $adminMenuData['page_ids']);
             $page_title = $adminMenuData['menu_name'];
             define('ADMIN_MENU_ID', $adminMenuData['menu_id']);
+            define('ADMIN_SECTION_ID', $adminMenuData['section_id']);
         }
     } else {
         define('ADMIN_MENU_ID', 0);
+        define('ADMIN_SECTION_ID', 0);
+    }
+    define('ADMIN_ALLOWED_PAGE_ID', $allowed_pages);
+}
+
+function createAdminConstants() {
+    if(defined('ADMIN_MENU_ID')) {
+        require_once(DIR_WS_MODEL.'AdminConstantsMaster.php');
+        $adminConstantsMaster = new AdminConstantsMaster();
+
+        $adminConstantsMaster->setSelect('admin_constants.constant_name, admin_constants_description.constant_value');
+        $adminConstantsMaster->setWhere('AND (section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
+        $adminConstantsMaster->setWhere('OR section_menu_id = :section_menu_id_1)', 0, 'int');
+        $constantsData = $adminConstantsMaster->getAdminConstants('yes');
+
+        if(!empty($constantsData)) {
+            foreach ($constantsData as $value) {
+                define($value['constant_name'], $value['constant_value']);
+            }
+        }
     }
 }
 
@@ -238,19 +236,32 @@ function draw_imge($img_http_path, $img_src_path, $extra_param = array()) {
     return $html;
 }
 
+function draw_noimge($extra_param = array()) {
+    $html = '';
+    $attr = get_attributes($extra_param);
+    $img_src_path = DIR_WS_IMAGES_COMMON.'no_preview.jpg';
+    $img_http_path = DIR_HTTP_IMAGES_COMMON.'no_preview.jpg';
+    
+    if(file_exists($img_src_path))
+        $html = '<img src="'.$img_http_path.'" '.$attr.'>';
+    return $html;
+}
+
 function createMenuActionConstants() {
-    require_once(DIR_WS_MODEL.'AdminConstantsMaster.php');
-    $adminConstantsMaster = new AdminConstantsMaster();
+    if(defined('ADMIN_MENU_ID')) {
+        require_once(DIR_WS_MODEL.'AdminConstantsMaster.php');
+        $adminConstantsMaster = new AdminConstantsMaster();
 
-    $adminConstantsMaster->setSelect('admin_menu_action.constant_name, admin_menu_action.title');
-    $adminConstantsMaster->setWhere('AND (section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
-    $adminConstantsMaster->setWhere('OR section_menu_id = :section_menu_id_1)', 0, 'int');
-    $adminConstantsMaster->setFrom('admin_menu_action');
-    $constantsData = $adminConstantsMaster->exec_query();
+        $adminConstantsMaster->setSelect('admin_menu_action.constant_name, admin_menu_action.title');
+        $adminConstantsMaster->setWhere('AND (section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
+        $adminConstantsMaster->setWhere('OR section_menu_id = :section_menu_id_1)', 0, 'int');
+        $adminConstantsMaster->setFrom('admin_menu_action');
+        $constantsData = $adminConstantsMaster->exec_query();
 
-    if(!empty($constantsData)) {
-        foreach ($constantsData as $value) {
-            define($value['constant_name'], $value['title']);
+        if(!empty($constantsData)) {
+            foreach ($constantsData as $value) {
+                define($value['constant_name'], $value['title']);
+            }
         }
     }
 }

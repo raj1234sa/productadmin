@@ -15,4 +15,8 @@ define('FILE_ADMIN_USER_EDIT', 'user_action.php');
 define('FILE_ADMIN_LANGUAGE_LISTING', 'language_listing.php');
 define('FILE_ADMIN_LANGUAGE_EDIT', 'language_action.php');
 
+define('FILE_ADMIN_WEBSITE_LOGOS', 'website_logos.php');
+
+define('FILE_ADMIN_AJAX_UPLOADER', 'file_uploader.php');
+
 ?>

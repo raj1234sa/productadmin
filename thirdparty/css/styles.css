@@ -146,7 +146,7 @@
 .sidebar-menu .logo{
     text-align: center;
 }
-.logo a {
+.logo a:not(.btn) {
     display: inline-block;
     max-width: 120px;
 }

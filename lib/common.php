@@ -7,7 +7,8 @@ if($is_cli) {
 } else {
     $docRoot = str_replace($_SERVER['DOCUMENT_ROOT'].'/', '', $_SERVER['SCRIPT_FILENAME']);
     $docRoot = (explode('/',$docRoot))[0];
-    $_SERVER['DOCUMENT_ROOT'] = $_SERVER['DOCUMENT_ROOT'].'/'.$docRoot;
+    $_SERVER['DOCUMENT_ROOT'] = str_replace('/','\\',$_SERVER['DOCUMENT_ROOT']);
+    $_SERVER['DOCUMENT_ROOT'] = $_SERVER['DOCUMENT_ROOT'].'\\'.$docRoot;
 }
 
 $script_name = $_SERVER['SCRIPT_NAME'];
@@ -52,6 +53,7 @@ if(IS_ADMIN) {
         'link' => (FILE_FILENAME_WITHOUT_EXT != 'welcome') ? DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME : '',
     );
 }
+require_once(DIR_WS_LIB.'siteconstants.php');
 // var_dump(IS_ADMIN);
 // echo '<pre>'; print_r($_SERVER); echo '</pre>'; exit;
 ?>

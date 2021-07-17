@@ -11,6 +11,7 @@ $admin_css_arr['global'] = array(
     DIR_HTTP_THIRDPARTY_CSS.'styles.css',
     DIR_HTTP_THIRDPARTY_CSS.'responsive.css',
     DIR_HTTP_THIRDPARTY_CSS.'jquery.dataTables.css',
+    DIR_HTTP_THIRDPARTY_CSS.'image-zoom.css',
     DIR_HTTP_THIRDPARTY_JS.'modernizr-2.8.3.min.js',
     DIR_HTTP_ADMIN_CSS.'admin.css',
 );

@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title><?php echo $page_title; ?> :: Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
+    <link rel="shortcut icon" type="image/<?php echo SITE_FAVICON_EXT ?>" href="<?php echo SITE_FAVICON ?>">
     <?php addCss($admin_css_arr) ?>
 </head>
     <body>
@@ -29,17 +29,20 @@
                             </div>
                             <ul class="breadcrumbs pull-left pr-3">
                                 <?php
-                                    $breadcrumb_arr=array_filter($breadcrumb_arr);
+                                if(!empty($breadcrumb_arr)) {
+                                    $breadcrumb_arr = array_filter($breadcrumb_arr);
                                     if(count($breadcrumb_arr) == 1) { unset($breadcrumb_arr[0]['link']); }
                                     foreach ($breadcrumb_arr as $key => $value) {
-                                    if(!empty($value)) {
-                                        if(isset($value['link'])) {
-                                            echo '<li><a href="'.$value['link'].'">'.$value['title'].'</a></li>';
-                                        } else {
-                                            echo '<li><span>'.$value['title'].'</span></li>';
+                                        if(!empty($value)) {
+                                            if(isset($value['link'])) {
+                                                echo '<li><a href="'.$value['link'].'">'.$value['title'].'</a></li>';
+                                            } else {
+                                                echo '<li><span>'.$value['title'].'</span></li>';
+                                            }
                                         }
                                     }
-                                } ?>
+                                }
+                                ?>
                             </ul>
                             <?php if(defined('DEV_MODE') && DEV_MODE) { ?>
                                 <div class="pt-1 pl-2">
@@ -277,5 +280,22 @@
             </div>
         </div>
         <?php addJs($admin_js_arr) ?>
+        <script>
+            <?php
+                $flash_message = $_SESSION['flash_message'];
+                unset($_SESSION['flash_message']);
+                echo "var message='".$flash_message[0]."';";
+                echo "var mode='".$flash_message[1]."';";
+            ?>
+            if(mode == 'success') {
+                successMessage(message);
+            } else if(mode == 'fail') {
+                failMessage(message);
+            }
+            var COMMON_SAVE_AND_BACK = "<?php echo COMMON_SAVE_AND_BACK ?>";
+            var COMMON_SAVE = "<?php echo COMMON_SAVE ?>";
+            var DIR_HTTP_IMAGES_COMMON = "<?php echo DIR_HTTP_IMAGES_COMMON ?>";
+            var COMMON_UPLOAD_ERROR = "<?php echo COMMON_UPLOAD_ERROR ?>";
+        </script>
     </body>
 </html>

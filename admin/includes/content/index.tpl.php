@@ -21,8 +21,9 @@
                         </div>
                         <div class="login-form-body">
                             <?php
-                                echo form_element(COMMON_USERNAME, 'text', 'admin_username', '');
-                                echo form_element(COMMON_PASSWORD, 'password', 'admin_password', '');
+                                $label_col_class = 0;
+                                echo form_element('', 'text', 'admin_username', '', array('placeholder'=>COMMON_USERNAME));
+                                echo form_element('', 'password', 'admin_password', '', array('placeholder'=>COMMON_PASSWORD));
                                 echo form_hidden('backurl', getValue('backurl'));
                             ?>
                             <div class="row mb-4 rmber-area justify-content-end">
