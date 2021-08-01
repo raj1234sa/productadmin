@@ -1,15 +1,10 @@
 <?php
 error_reporting(0);
 
-$is_cli = (!isset($_SERVER['HTTP_USER_AGENT']));
-if($is_cli) {
-    $_SERVER['DOCUMENT_ROOT'] = 'C:\xampp\htdocs\productadmin';
-} else {
-    $docRoot = str_replace($_SERVER['DOCUMENT_ROOT'].'/', '', $_SERVER['SCRIPT_FILENAME']);
-    $docRoot = (explode('/',$docRoot))[0];
-    $_SERVER['DOCUMENT_ROOT'] = str_replace('/','\\',$_SERVER['DOCUMENT_ROOT']);
-    $_SERVER['DOCUMENT_ROOT'] = $_SERVER['DOCUMENT_ROOT'].'\\'.$docRoot;
-}
+$docRoot = str_replace($_SERVER['DOCUMENT_ROOT'].'/', '', $_SERVER['SCRIPT_FILENAME']);
+$docRoot = (explode('/',$docRoot))[0];
+$_SERVER['DOCUMENT_ROOT'] = str_replace('/','\\',$_SERVER['DOCUMENT_ROOT']);
+$_SERVER['DOCUMENT_ROOT'] = $_SERVER['DOCUMENT_ROOT'].'\\'.$docRoot;
 
 $script_name = $_SERVER['SCRIPT_NAME'];
 $filename = pathinfo($script_name, PATHINFO_BASENAME);
@@ -28,32 +23,40 @@ if(!$is_cli && strpos($_SERVER['REQUEST_URI'], '/admin/') !== FALSE) {
 }
 
 $is_ajax_request = false;
-if($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     $is_ajax_request = true;
 }
 
 require_once(DIR_WS_MODEL_CLASSES.'RMasterModel.php');
+include_once DIR_WS_MODEL_CLASSES.'RDataModel.php';
+require_once(DIR_WS_MODEL.'UtilMaster.php');
 require_once(DIR_WS_VENDOR."autoload.php");
 require_once(DIR_WS_LIB.'functions.php');
+require_once(DIR_WS_LIB.'siteconstants.php');
 if(IS_ADMIN) {
-    $page_title = '';
+    $page_title = $global_js = '';
     require_once(DIR_WS_ADMIN_INCLUDES.'functions.php');
     defineAccessData();
     require_once(DIR_WS_ADMIN_INCLUDES.'filenames.php');
     createAdminConstants();
-    createMenuActionConstants();
     require_once(DIR_WS_ADMIN_INCLUDES.'sessions.php');
     require_once(DIR_WS_ADMIN_INCLUDES.'html_component.php');
     require_once(DIR_WS_ADMIN_INCLUDES.'html_render.php');
     require_once(DIR_WS_ADMIN_INCLUDES.'css.php');
     require_once(DIR_WS_ADMIN_INCLUDES.'js.php');
+    require_once(DIR_WS_ADMIN_INCLUDES.'table_helper.php');
     
     $breadcrumb_home = array(
         'title' => COMMON_DASHBOARD,
         'link' => (FILE_FILENAME_WITHOUT_EXT != 'welcome') ? DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME : '',
     );
+} else {
+    $twc = array();
+    createFrontConstants();
+    require_once(DIR_WS_LIB.'twig.php');
+    // echo '<pre>'; print_r($twc); echo '</pre>'; exit;
+    define('FILE_MAIN_INTERFACE', 'mainpage.tpl');
 }
-require_once(DIR_WS_LIB.'siteconstants.php');
 // var_dump(IS_ADMIN);
 // echo '<pre>'; print_r($_SERVER); echo '</pre>'; exit;
 ?>

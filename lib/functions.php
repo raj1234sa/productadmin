@@ -77,7 +77,7 @@ function is_blank($value, $type = null) {
 }
 
 function set_flash_message($message, $mode) {
-    $_SESSION['flash_message'] = array($message, $mode);
+    setcookie('flash_message', json_encode(array($message, $mode)));
 }
 function getValue($name, $default='') {
     if(isset($_GET[$name])) {
@@ -112,6 +112,35 @@ function fileValue($name, $default='') {
     // return (isset($_FILES[$name]) && !empty($_FILES[$name])) ? $_FILES[$name]['name'] : $default;
 }
 
+function checkEmpty($value, $msg) {
+    if(empty($value) || !isset($value) || $value == '') {
+        return $msg;
+    }
+}
+
+function checkEmailPattern($value, $msg) {
+    if(!preg_match("/(?:[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*|'(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*')@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/", $value)) {
+        return $msg;
+    }
+}
+
+function checkPhoneNumber($value, $msg) {
+    if(!preg_match("/^[0-9]{10}$/", $value)) {
+        return $msg;
+    }
+}
+
+function checkValidation($err) {
+    $validation = true;
+    foreach ($err as $value) {
+        if(!empty($value)) {
+            $validation = false;
+            break;
+        }
+    }
+    return $validation;
+}
+
 function show_page_header($url) {
     header("Location: ".$url);
     exit;
@@ -121,11 +150,9 @@ function generateFileName($filename) {
     $filename = str_replace(' ', '_', $filename);
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
     $filename = pathinfo($filename, PATHINFO_FILENAME);
-    $return_filename = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $filename).time().'.'.$ext;
+    $return_filename = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $filename).'_'.time().'.'.$ext;
     return $return_filename;
 }
-
-
 
 function uploadFiles($destination, $element) {
     if(!empty($element)) {
@@ -151,6 +178,13 @@ function getWebsiteLogos() {
         $wLogosData = $wLogosData[0];
     }
     return $wLogosData;
+}
+
+function createFrontConstants() {
+    global $twc;
+    foreach (get_defined_constants(true)['user'] as $key => $value) {
+        $twc[$key] = $value;
+    }
 }
 
 ?>

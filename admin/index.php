@@ -4,6 +4,8 @@ require_once(DIR_WS_MODEL.'AdminMaster.php');
 
 $adminMaster = new AdminMaster();
 
+$err = array();
+
 $submit = postValue('admin_login');
 if($submit == 'yes') {
     $admin_username = postValue('admin_username');
@@ -22,7 +24,10 @@ if($submit == 'yes') {
         } else {
             show_page_header(FILE_ADMIN_WELCOME);
         }
+    } else {
+        $err['username'] = COMMON_LOGIN_ERROR;
     }
 }
 
 require_once(DIR_WS_ADMIN_CONTENTS.FILE_MAIN_INTERFACE);
+?>

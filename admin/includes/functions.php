@@ -63,13 +63,18 @@ function createAdminConstants() {
     }
 }
 
-function extract_search_fields($prefix = '') {
+function extract_search_fields() {
     $search_data = requestValue('data');
     parse_str($search_data, $result_search);
     $result_search['start'] = requestValue('start');
     $result_search['length'] = requestValue('length');
-    $result_search['column'] = requestValue('columns')[requestValue('order')[0]['column']]['data'];
-    $result_search['dir'] = requestValue('order')[0]['dir'];
+    $result_search['column'] = $result_search['dir'] = '';
+    if(isset($_REQUEST['order'])) {
+        $result_search['column'] = requestValue('columns')[requestValue('order')[0]['column']]['data'];
+        $result_search['dir'] = requestValue('order')[0]['dir'];
+    }
+    parse_str(requestValue('searchval'), $url_params);
+    $result_search = array_merge($result_search, $url_params);
     return $result_search;
 }
 
@@ -247,23 +252,36 @@ function draw_noimge($extra_param = array()) {
     return $html;
 }
 
-function createMenuActionConstants() {
-    if(defined('ADMIN_MENU_ID')) {
-        require_once(DIR_WS_MODEL.'AdminConstantsMaster.php');
-        $adminConstantsMaster = new AdminConstantsMaster();
+// function createMenuActionConstants() {
+//     if(defined('ADMIN_MENU_ID')) {
+//         $objUtilMaster = new UtilMaster();
 
-        $adminConstantsMaster->setSelect('admin_menu_action.constant_name, admin_menu_action.title');
-        $adminConstantsMaster->setWhere('AND (section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
-        $adminConstantsMaster->setWhere('OR section_menu_id = :section_menu_id_1)', 0, 'int');
-        $adminConstantsMaster->setFrom('admin_menu_action');
-        $constantsData = $adminConstantsMaster->exec_query();
+//         $objUtilMaster->setSelect('admin_menu_action.constant_name, admin_menu_action.title');
+//         $objUtilMaster->setWhere('AND section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
+//         $objUtilMaster->setFrom('admin_menu_action');
+//         $constantsData = $objUtilMaster->exec_query();
 
-        if(!empty($constantsData)) {
-            foreach ($constantsData as $value) {
-                define($value['constant_name'], $value['title']);
-            }
-        }
+//         if(!empty($constantsData)) {
+//             foreach ($constantsData as $value) {
+//                 define($value['constant_name'], $value['title']);
+//             }
+//         }
+//     }
+// }
+
+function get_available_actions() {
+    $return_arr = array();
+
+    $objUtilMaster = new UtilMaster();
+
+    $objUtilMaster->setFrom('admin_menu_action');
+    $objUtilMaster->setWhere('AND section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
+    $menu_actions = $objUtilMaster->exec_query();
+
+    foreach ($menu_actions as $value) {
+        $return_arr[constant($value['constant_name'])] = '';
     }
+    return $return_arr;
 }
 
 ?>

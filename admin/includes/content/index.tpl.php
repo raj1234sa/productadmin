@@ -5,7 +5,7 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>Login :: Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
+        <link rel="shortcut icon" type="image/<?php echo SITE_FAVICON_EXT ?>" href="<?php echo SITE_FAVICON ?>">
         <?php addCss($admin_css_arr) ?>
     </head>
     <body>
@@ -22,8 +22,9 @@
                         <div class="login-form-body">
                             <?php
                                 $label_col_class = 0;
-                                echo form_element('', 'text', 'admin_username', '', array('placeholder'=>COMMON_USERNAME));
-                                echo form_element('', 'password', 'admin_password', '', array('placeholder'=>COMMON_PASSWORD));
+                                $validation = array('required'=>COMMON_VALIDATE_REQUIRED);
+                                echo form_element('', 'text', 'admin_username', '', array('placeholder'=>COMMON_USERNAME, 'validation'=>$validation, 'error'=>$err['username']));
+                                echo form_element('', 'password', 'admin_password', '', array('placeholder'=>COMMON_PASSWORD, 'validation'=>$validation));
                                 echo form_hidden('backurl', getValue('backurl'));
                             ?>
                             <div class="row mb-4 rmber-area justify-content-end">

@@ -1,5 +1,4 @@
 <?php
-include_once DIR_WS_MODEL_CLASSES.'RDataModel.php';
 
 class AdminData extends RDataModel {
     protected function PropertyMap() {

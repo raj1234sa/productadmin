@@ -44,4 +44,8 @@ define('DIR_WS_IMAGES_COMMON', DIR_WS_IMAGES.'common\\');
 define('DIR_HTTP_IMAGES_COMMON', DIR_HTTP_IMAGES.'common/');
 
 
+define('DIR_WS_TEMPLATES', SITE_DOCUMENT_ROOT.'templates\\');
+
+define('DIR_WS_TEMPLATES_CONTENT', DIR_WS_TEMPLATES.'content\\');
+
 ?>

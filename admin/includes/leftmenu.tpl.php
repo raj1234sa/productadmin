@@ -16,6 +16,7 @@ foreach ($adminSectionData as $key => $value) {
     $AdminMenuMaster->setOrderBy("sort_order ASC");
     $AdminMenuMaster->setJoin('LEFT JOIN admin_pages ON admin_pages.page_id = admin_section_menu.action_page');
     $AdminMenuMaster->setWhere('AND section_id = :section_id', $value['section_id'], 'int');
+    $AdminMenuMaster->setWhere('AND status = :status', '1', 'string');
     $adminMenuData = $AdminMenuMaster->getAdminMenu('yes');
 
     $finalLeftMenuData[$key] = array(
