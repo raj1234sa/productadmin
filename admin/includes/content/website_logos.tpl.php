@@ -9,9 +9,9 @@
     </div>
     <div class="mt-4">
         <?php
-            echo form_element(LABEL_SITE_LOGO, 'file', 'logo[site_logo]', $wLogosData['site_logo'], array('data-ajax'=>DIR_HTTP_ADMIN.FILE_ADMIN_AJAX_UPLOADER, 'data-src-path'=>DIR_WS_WEBSITE_LOGOS, 'data-http-path'=>DIR_HTTP_WEBSITE_LOGOS, 'form_group_class'=>'no-gutters', 'id'=>'site_logo', 'allow_delete'=>false));
+            echo form_element(LABEL_SITE_LOGO, 'file', 'logo[site_logo]', $wLogosData['site_logo'], '', array('data-ajax'=>DIR_HTTP_ADMIN.FILE_ADMIN_AJAX_UPLOADER, 'data-src-path'=>DIR_WS_WEBSITE_LOGOS, 'data-http-path'=>DIR_HTTP_WEBSITE_LOGOS, 'form_group_class'=>'no-gutters', 'id'=>'site_logo', 'allow_delete'=>false));
             
-            echo form_element(LABEL_SITE_FAVICON, 'file', 'logo[site_favicon]', $wLogosData['site_favicon'], array('data-ajax'=>DIR_HTTP_ADMIN.FILE_ADMIN_AJAX_UPLOADER, 'data-src-path'=>DIR_WS_WEBSITE_LOGOS, 'data-http-path'=>DIR_HTTP_WEBSITE_LOGOS, 'form_group_class'=>'no-gutters', 'id'=>'site_favicon'));
+            echo form_element(LABEL_SITE_FAVICON, 'file', 'logo[site_favicon]', $wLogosData['site_favicon'], '', array('data-ajax'=>DIR_HTTP_ADMIN.FILE_ADMIN_AJAX_UPLOADER, 'data-src-path'=>DIR_WS_WEBSITE_LOGOS, 'data-http-path'=>DIR_HTTP_WEBSITE_LOGOS, 'form_group_class'=>'no-gutters', 'id'=>'site_favicon'));
         ?>
     </div>
 </form>

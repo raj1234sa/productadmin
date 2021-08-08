@@ -39,15 +39,13 @@ foreach ($adminSectionData as $key => $value) {
 if(defined('SITE_LOGO') && SITE_LOGO == '') {
     $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WEBSITE_LOGOS."' class='btn btn-primary'>Upload Logo Here</a>";
 } else {
-    $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME."'><img src='".SITE_LOGO."' alt='logo'></a>";
+    $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME."' title='".CONFIG_SITE_NAME."'><img src='".SITE_LOGO."' alt='logo'></a>";
 }
-// echo '<pre>'; print_r($finalLeftMenuData); echo '</pre>'; exit;
 ?>
 <div class="sidebar-menu">
     <div class="sidebar-header">
         <div class="logo">
             <?php echo $logo_text; ?>
-            
         </div>
     </div>
     <div class="main-menu">

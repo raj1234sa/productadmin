@@ -234,7 +234,7 @@ p[id*=err_], *[id*=filename_] {
     .table-bottom {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: baseline;
     }
     #filterForm {
         padding: 0px 0px;
@@ -402,6 +402,7 @@ img.image_zoom {
 .col-form-label {
     width: 100%;
     font-size: 1rem;
+    color: #000;
 }
 
 [id^="filepreview_"] {
@@ -429,8 +430,16 @@ input.error-block:focus {
     border: 1px solid #dc3545;
 }
 
-input.valid-block:focus {
+input.valid-block {
     border: 1px solid #28a745;
+}
+
+textarea.form-ckeditor.error-block + .ck-editor .ck-editor__editable:focus {
+    border: 1px solid #dc3545 !important;
+}
+
+textarea.form-ckeditor.valid-block + .ck-editor .ck-editor__editable:focus {
+    border: 1px solid #28a745 !important;
 }
 
 .form-switch {
@@ -454,4 +463,8 @@ input.valid-block:focus {
     content: '\f101';
     text-rendering: auto;
     padding-right: 8px;
+}
+
+.pa-input {
+    align-items: baseline;
 }

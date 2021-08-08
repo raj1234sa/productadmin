@@ -34,7 +34,7 @@ if($action == 'delete') {
     exit;
 }
 
-if($is_ajax_request && ($listing_data || $export)) {
+if($isAjaxRequest && ($listing_data || $export)) {
     extract(extract_search_fields(), EXTR_PREFIX_ALL, 'SC');
 
     if($SC_column == 'user_info') { $SC_column = 'firstname'; }
@@ -73,7 +73,7 @@ if($is_ajax_request && ($listing_data || $export)) {
     $totalRec = 0;
     if(!empty($passengersDetails)) {
         $totalRec = $passengersDetails->FoundRows();
-        $sr = $search['start'] + 1;
+        $sr = $SC_start + 1;
         foreach ($passengersDetails as $passenger) {
             $rec = array();
             $rec['DT_RowId'] = "passenger:".$passenger['passenger_id'];
@@ -104,10 +104,10 @@ if($is_ajax_request && ($listing_data || $export)) {
     echo json_encode($result);
     exit;
 }
-$heading_label = $page_title;
+$headingLabel = $pageTitle;
 
-$breadcrumb_arr = array(
-    $breadcrumb_home,
+$breadcrumbArr = array(
+    $breadcrumbHome,
     array(
         'title' => COMMON_PASSENGERS,
     ),

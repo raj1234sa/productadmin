@@ -19,11 +19,11 @@ function defineAccessData() {
         define('ADMIN_PAGE_ID', 0);
     }
 
-    global $page_title;
+    global $pageTitle;
     if(FILE_FILENAME_WITHOUT_EXT == 'welcome') {
-        $page_title = 'Dashboard';
+        $pageTitle = 'Dashboard';
     }
-    $allowed_pages = array();
+    $allowedPages = array();
     $AdminMenuMaster = new AdminMenuMaster();
     if(defined('ADMIN_PAGE_ID') && ADMIN_PAGE_ID > 0) {
         $AdminMenuMaster->setWhere('AND FIND_IN_SET("'.ADMIN_PAGE_ID.'", page_ids) > 0', '', 'string');
@@ -33,8 +33,8 @@ function defineAccessData() {
         if(empty($adminMenuData)) { define('ADMIN_MENU_ID', 0); define('ADMIN_SECTION_ID', 0); }
         elseif(!empty($adminMenuData)) {
             $adminMenuData = $adminMenuData[0];
-            $allowed_pages = explode(',', $adminMenuData['page_ids']);
-            $page_title = $adminMenuData['menu_name'];
+            $allowedPages = explode(',', $adminMenuData['page_ids']);
+            $pageTitle = $adminMenuData['menu_name'];
             define('ADMIN_MENU_ID', $adminMenuData['menu_id']);
             define('ADMIN_SECTION_ID', $adminMenuData['section_id']);
         }
@@ -42,7 +42,7 @@ function defineAccessData() {
         define('ADMIN_MENU_ID', 0);
         define('ADMIN_SECTION_ID', 0);
     }
-    define('ADMIN_ALLOWED_PAGE_ID', $allowed_pages);
+    define('ADMIN_ALLOWED_PAGE_ID', $allowedPages);
 }
 
 function createAdminConstants() {
@@ -64,18 +64,18 @@ function createAdminConstants() {
 }
 
 function extract_search_fields() {
-    $search_data = requestValue('data');
-    parse_str($search_data, $result_search);
-    $result_search['start'] = requestValue('start');
-    $result_search['length'] = requestValue('length');
-    $result_search['column'] = $result_search['dir'] = '';
+    $searchData = requestValue('data');
+    parse_str($searchData, $resultSearch);
+    $resultSearch['start'] = requestValue('start');
+    $resultSearch['length'] = requestValue('length');
+    $resultSearch['column'] = $resultSearch['dir'] = '';
     if(isset($_REQUEST['order'])) {
-        $result_search['column'] = requestValue('columns')[requestValue('order')[0]['column']]['data'];
-        $result_search['dir'] = requestValue('order')[0]['dir'];
+        $resultSearch['column'] = requestValue('columns')[requestValue('order')[0]['column']]['data'];
+        $resultSearch['dir'] = requestValue('order')[0]['dir'];
     }
-    parse_str(requestValue('searchval'), $url_params);
-    $result_search = array_merge($result_search, $url_params);
-    return $result_search;
+    parse_str(requestValue('searchval'), $urlParams);
+    $resultSearch = array_merge($resultSearch, $urlParams);
+    return $resultSearch;
 }
 
 function export_report($spreadsheet, $fileName = 'download.xlsx') {
@@ -90,8 +90,8 @@ function export_report($spreadsheet, $fileName = 'download.xlsx') {
     );
 }
 
-function export_file_generate($export_data_structure, $export_data, $extra = array()) {
-    if (!empty($export_data)) {
+function export_file_generate($exportDataStructure, $exportData, $extra = array()) {
+    if (!empty($exportData)) {
         $rowIndex = 0;
         $colIndex = 0;
         $spreadsheet = new Spreadsheet();
@@ -141,7 +141,7 @@ function export_file_generate($export_data_structure, $export_data, $extra = arr
             ],
         ];
         $headerCells = array();
-        foreach ($export_data_structure as $key => $value) {
+        foreach ($exportDataStructure as $key => $value) {
             foreach ($value as $value1) {
                 $header[] = $value1['title'];
                 $sheet->setCellValue(chr(65 + $key) . '1', $value1['title']);
@@ -163,10 +163,10 @@ function export_file_generate($export_data_structure, $export_data, $extra = arr
 
         $sheet->getRowDimension(1)->setRowHeight(30);
         $cellvalue = array();
-        foreach ($export_data as $rowcount => $value) {
+        foreach ($exportData as $rowcount => $value) {
             $value = objectToArray($value);
             $rowcount += $rowIndex;
-            foreach ($export_data_structure as $colcount => $value1) {
+            foreach ($exportDataStructure as $colcount => $value1) {
                 $cellHeight = 15;
                 $value1 = array_values($value1)[0];
                 if(isset($value1['call_func']) && !empty($value1['call_func'])) {
@@ -232,56 +232,39 @@ function export_file_generate($export_data_structure, $export_data, $extra = arr
     }
 }
 
-function draw_imge($img_http_path, $img_src_path, $extra_param = array()) {
+function draw_imge($imgHttpPath, $imgSrcPath, $extraParam = array()) {
     $html = '';
-    $attr = get_attributes($extra_param);
+    $attr = get_attributes($extraParam);
     
-    if(file_exists($img_src_path))
-        $html = '<img src="'.$img_http_path.'" '.$attr.'>';
+    if(file_exists($imgSrcPath))
+        $html = '<img src="'.$imgHttpPath.'" '.$attr.'>';
     return $html;
 }
 
-function draw_noimge($extra_param = array()) {
+function draw_noimge($extraParam = array()) {
     $html = '';
-    $attr = get_attributes($extra_param);
-    $img_src_path = DIR_WS_IMAGES_COMMON.'no_preview.jpg';
-    $img_http_path = DIR_HTTP_IMAGES_COMMON.'no_preview.jpg';
+    $attr = get_attributes($extraParam);
+    $imgSrcPath = DIR_WS_IMAGES_COMMON.'no_preview.jpg';
+    $imgHttpPath = DIR_HTTP_IMAGES_COMMON.'no_preview.jpg';
     
-    if(file_exists($img_src_path))
-        $html = '<img src="'.$img_http_path.'" '.$attr.'>';
+    if(file_exists($imgSrcPath))
+        $html = '<img src="'.$imgHttpPath.'" '.$attr.'>';
     return $html;
 }
-
-// function createMenuActionConstants() {
-//     if(defined('ADMIN_MENU_ID')) {
-//         $objUtilMaster = new UtilMaster();
-
-//         $objUtilMaster->setSelect('admin_menu_action.constant_name, admin_menu_action.title');
-//         $objUtilMaster->setWhere('AND section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
-//         $objUtilMaster->setFrom('admin_menu_action');
-//         $constantsData = $objUtilMaster->exec_query();
-
-//         if(!empty($constantsData)) {
-//             foreach ($constantsData as $value) {
-//                 define($value['constant_name'], $value['title']);
-//             }
-//         }
-//     }
-// }
 
 function get_available_actions() {
-    $return_arr = array();
+    $returnArr = array();
 
     $objUtilMaster = new UtilMaster();
 
     $objUtilMaster->setFrom('admin_menu_action');
     $objUtilMaster->setWhere('AND section_menu_id = :section_menu_id', ADMIN_MENU_ID, 'int');
-    $menu_actions = $objUtilMaster->exec_query();
+    $menuActions = $objUtilMaster->exec_query();
 
-    foreach ($menu_actions as $value) {
-        $return_arr[constant($value['constant_name'])] = '';
+    foreach ($menuActions as $value) {
+        $returnArr[constant($value['constant_name'])] = '';
     }
-    return $return_arr;
+    return $returnArr;
 }
 
 ?>

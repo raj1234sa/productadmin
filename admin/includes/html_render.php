@@ -1,9 +1,9 @@
 <?php
-function draw_action_buttons($action_buttons) {
-    $available_action_links = get_available_actions();
+function draw_action_buttons($actionButtons) {
+    $availableActionLinks = get_available_actions();
     $html = '<div class="text-right action-buttons-div">';
-    foreach ($action_buttons as $key => $item) {
-        if(!array_key_exists($key, $available_action_links)) { continue; }
+    foreach ($actionButtons as $key => $item) {
+        if(!array_key_exists($key, $availableActionLinks)) { continue; }
         $html .= "<a href=" . $item['link'] . " class='btn {$item['class']}'>
                     <i class='{$item['icon']} pa-icon'></i>
                     $key
@@ -14,14 +14,14 @@ function draw_action_buttons($action_buttons) {
 }
 
 /**
- * @param string $submit_buttons
+ * @param string $submitButtons
  * @param array $extra
  * @return string
  */
-function draw_form_buttons($submit_buttons, $extra = array()) {
-    $submit_buttons = explode(',', $submit_buttons);
+function draw_form_buttons($submitButtons, $extra = array()) {
+    $submitButtons = explode(',', $submitButtons);
     $html = '<div class="float-right">';
-    foreach ($submit_buttons as $value) {
+    foreach ($submitButtons as $value) {
         switch ($value) {
             case 'save':
                 $html .= '<button type="submit" name="submit_btn" value="'.COMMON_SAVE.'" class="btn btn-sm btn-info formsubmit mr-1" id="formSubmit">
@@ -52,41 +52,46 @@ function draw_form_buttons($submit_buttons, $extra = array()) {
     return $html;
 }
 
-function draw_action_menu($action_links) {
-    $available_action_links = get_available_actions();
+function draw_action_menu($actionLinks) {
+    $availableActionLinks = get_available_actions();
+    $count = 0;
     $html = '<div class="table_action_buttons">';
-    if(count($action_links) > 3) {
+    if(count($actionLinks) > 3) {
         $html .= '<div class="dropdown">
                     <button data-toggle="dropdown" class="btn btn-sm btn-secondary dropdown-toggle" aria-expanded="false">
                         '.COMMON_ACTION.'
                     </button>
                     <div class="dropdown-menu dropdown-menu-right action-menu">';
-        foreach ($action_links as $key => $value) {
-            if(!array_key_exists($key, $available_action_links)) { continue; }
+        foreach ($actionLinks as $key => $value) {
+            if(!array_key_exists($key, $availableActionLinks)) { continue; }
             $class = '';
             if (isset($value['class'])) {
                 $class = $value['class'];
             }
             $html .= "<a href='{$value['link']}' class='dropdown-item $class'><i class='{$value['icon']} pa-icon'></i>$key</a>";
+            $count++;
         }
         $html .= '</div></div>';
     } else {
-        foreach ($action_links as $key => $value) {
-            if(!array_key_exists($key, $available_action_links)) { continue; }
+        foreach ($actionLinks as $key => $value) {
+            if(!array_key_exists($key, $availableActionLinks)) { continue; }
             $class = '';
             if (isset($value['class'])) {
                 $class = $value['class'];
             }
             $html .= "<a href='{$value['link']}' class='btn btn-sm $class'>
             <i class='{$value['icon']}'></i></a>";
+            $count++;
         }
     }
     $html .= '</div>';
+    if($count == 0) {
+        $html = '---';
+    }
     return $html;
 }
 
-function form_element($label, $type='text', $name, $value = '', $extra = array()) {
-    global $label_col_class;
+function form_element($label, $type='text', $name, $value = '', $class = '', $extra = array()) {
     $return = '';
     
     $id = $name;
@@ -94,73 +99,50 @@ function form_element($label, $type='text', $name, $value = '', $extra = array()
         $id = $extra['id'];
     }
 
-    $frm_grp_classes = '';
-    $frm_grp_classes = $extra['form_group_class'];
-    if($label_col_class == '') {
-        $label_col_class = 3;
+    $frmGrpClasses = '';
+    $frmGrpClasses = $extra['form_group_class'];
+    if($type != 'switchbutton') {
+        $frmGrpClasses .= ' pa-input';
     }
-    $element_col_class = 12 - $label_col_class;
 
-    $return .= '<div class="form-group row no-gutters'.$frm_grp_classes.'">';
+    $colClasses = getExtraClasses($class);
+
+    $labelColClass = $colClasses['label'];
+    $elementColClass = $colClasses['input'];
+
+    $return .= '<div class="form-group row no-gutters '.$frmGrpClasses.'">';
     if(!empty($label)) {
-        $return .= '<div class="col-12 col-md-'.$label_col_class.'"><label class="m-0 col-form-label" for="'.$id.'">'.$label.'</label></div>';
+        $return .= '<div class="col-12 col-md-'.$labelColClass.'"><label class="m-0 col-form-label" for="'.$id.'">'.$label.'</label></div>';
     } else {
-        $element_col_class = 12;
+        $elementColClass = 12;
     }
-    $attr_str = get_attributes($extra);
+    $attrStr = get_attributes($extra);
     $args = func_get_args();
     array_shift($args);
-    $extra_classes = '';
+    $extraClasses = '';
     switch ($type) {
         case 'text':
         case 'password':
         case 'number':
         case 'switchbutton':
         case 'file':
-            // $extra_params = '';
-            // if($type == 'number') {
-            //     $extra_params .= 'data-type="number" class="only-number"';
-            //     $type = 'text';
-            // }
-            // $return .= '<input type="'.$type.'" id="'.$id.'" '.$extra_params.' name="'.$name.'" class="form-control '.$element_classes.'" value="'.$value.'" '.$attr_str.' />';
+        case 'label':
+        case 'select':
             array_shift($args);
+            unset($args[2]);
             if($type == 'switchbutton') {
-                $extra_classes .= ' form-switch';
+                $extraClasses .= ' form-switch';
             }
-            $return .= '<div class="col-12 col-md-'.$element_col_class.' '.$extra_classes.'">';
+            $return .= '<div class="col-12 col-md-'.$elementColClass.' '.$extraClasses.'">';
             $return .= call_user_func_array('form_'.$type, $args);
-            // $return .= form_text(func_get_arg(1), func_get_arg(2), func_get_arg(3), $extra);
             $return .= '</div>';
             break;
         case 'ckeditor':
             array_shift($args);
-            $return .= '<div class="col-12 col-md-'.$element_col_class.' '.$extra_classes.'">';
+            unset($args[2]);
+            $return .= '<div class="col-12 col-md-'.$elementColClass.' '.$extraClasses.'">';
             $return .= call_user_func_array('form_'.$type, $args);
             $return .= '</div>';
-            break;
-        // case 'switchbutton':
-            // $return .= '<div class="col-xs-3">
-            //                 <label class="switch-radio">
-            //                     <input id="'.$id.'" name="'.$name.'" '.$extra_params.' class="ace ace-switch ace-switch-6" type="checkbox" '.$attr_str.' />
-            //                     <span class="lbl"></span>
-            //                 </label>
-            //             </div>';
-            // $return .= '</div>';
-            // $return .= '<div class="col-12 col-md-'.$element_col_class.'">';
-            // $return .= form_switchbutton(func_get_arg(2), func_get_arg(3), $extra);
-            // $return .= '</div>';
-            // break;
-        case 'select':
-            $list = $extra['list'];
-            $return .= '<div class="col-sm-5">
-                            <select class="chosen-select" '.$extra['attributes'].' id="'.$id.'" name="'.$name.' '.$attr_str.'">';
-            $return .= $extra['list_before'];
-            foreach ($list as $option) {
-                $selected = $value == $option[$extra['value_field']] ? 'selected' : '';
-                $return .= "<option $selected value='".$option[$extra['value_field']]."'>".$option[$extra['text_field']]."</option>";
-            }
-            $return .= '    </select>
-                        </div>';
             break;
         case 'textarea':
             $extra_class = '';
@@ -176,25 +158,13 @@ function form_element($label, $type='text', $name, $value = '', $extra = array()
                 $cols = "cols='".$extra['cols']."'";
             }
             $return .= '<div class="col-sm-5">';
-            $return .= '<textarea id="'.$id.'" name="'.$name.'" class="form-control '.$extra_class.'" '.$rows.' '.$cols.' '.$attr_str.'>'.$value.'</textarea>';
+            $return .= '<textarea id="'.$id.'" name="'.$name.'" class="form-control '.$extra_class.'" '.$rows.' '.$cols.' '.$attrStr.'>'.$value.'</textarea>';
             $return .= '</div>';
             break;
-        // case 'file':
-            // $return .= '<input type="file" class="form-hide" id="'.$id.'" name="'.$name.'">';
-            // $return .= '<div class="col-sm-5 upload_file_div">';
-            // $return .= '<button type="button" class="btn btn-xs btn-success upload_file" data-trigger="#'.$id.'">
-            //                 <i class="pa-icon fas fa-upload bigger-110"></i>
-            //                 Upload File
-            //             </button>';
-            // $return .= '</div>';
-            // $return .= '<div class="col-12 col-md-'.$element_col_class.'">';
-            // $return .= form_file(func_get_arg(2), func_get_arg(3), $extra);
-            // $return .= '</div>';
-            // break;
         case 'datepicker':
             $return .= '<div class="col-sm-5">';
             $return .= '<div class="input-group col-xs-10 col-sm-5">';
-            $return .= '<input class="form-control date-picker '.$element_classes.'" id="'.$id.'" name="'.$name.'" type="text" data-date-format="'.SITE_DATE_FORMAT.'" value="'.$value.'" '.$attr_str.' />
+            $return .= '<input class="form-control date-picker '.$elementClasses.'" id="'.$id.'" name="'.$name.'" type="text" data-date-format="'.SITE_DATE_FORMAT.'" value="'.$value.'" '.$attrStr.' />
                         <span class="input-group-addon">
                             <i class="fa fa-calendar pa-icon"></i>
                         </span>';
@@ -214,11 +184,10 @@ function form_ckeditor($name, $value = '', $extra = array()) {
         $id = $extra['id'];
     }
 
-    $element_classes = '';
-    $element_classes = $extra['element_classes'];
+    $elementClasses = '';
+    $elementClasses = $extra['element_classes'];
     $validation = $extra['validation'];
     if(!empty($validation)) {
-        unset($extra['validation']);
         if($validation) {
             foreach ($validation as $key => $value1) {
                 $extra['data-validation-'.$key] = $value1;
@@ -227,15 +196,13 @@ function form_ckeditor($name, $value = '', $extra = array()) {
     }
     if(isset($extra['error']) && !empty($extra['error'])) {
         $extra['data-error'] = $extra['error'];
-        unset($extra['error']);
     }
-    unset($extra['element_classes']);
-    $attr_str = get_attributes($extra);
+    $attrStr = get_attributes($extra);
     
     if(!empty($validation['required'])) {
         $return .= "<div class='d-flex position-relative validation-group'>";
     }
-    $return .= '<textarea name="'.$name.'" id="'.$id.'" class="form-ckeditor '.$element_classes.'" '.$attr_str.'>';
+    $return .= '<textarea name="'.$name.'" id="'.$id.'" class="form-ckeditor '.$elementClasses.'" '.$attrStr.'>';
     $return .= $value;
     $return .= '</textarea>';
     if(!empty($validation['required'])) {
@@ -244,40 +211,18 @@ function form_ckeditor($name, $value = '', $extra = array()) {
     return $return;
 }
 
-// function form_switchbutton($name, $value = '', $extra = array()) {
-//     $return = '';
-    
-//     $id = $name;
-//     if(!empty($extra['id'])) {
-//         $id = $extra['id'];
-//     }
-
-//     $element_classes = $extra['class'];
-//     $extra_params = '';
-//     if(!empty($value)) {
-//         $extra_params .= ' checked';
-//     }
-//     $extra_params .= $extra['params'];
-//     $return .= '<label class="switch-radio">
-//                     <input id="'.$id.'" name="'.$name.'" '.$extra_params.' class="ace ace-switch ace-switch-6 '.$element_classes.'" type="checkbox" />
-//                     <span class="lbl"></span>
-//                 </label>';
-//     return $return;
-// }
-
 function form_text($name, $value = '', $extra = array()) {
     $return = '';
     
-    $id = $name;
+    $id = str_replace(array('[',']'), '_', $name);
     if(!empty($extra['id'])) {
         $id = $extra['id'];
     }
 
-    $element_classes = '';
-    $element_classes = $extra['element_classes'];
+    $elementClasses = '';
+    $elementClasses = $extra['element_classes'];
     $validation = $extra['validation'];
     if(!empty($validation)) {
-        unset($extra['validation']);
         if($validation) {
             foreach ($validation as $key => $value1) {
                 $extra['data-validation-'.$key] = $value1;
@@ -286,10 +231,8 @@ function form_text($name, $value = '', $extra = array()) {
     }
     if(isset($extra['error']) && !empty($extra['error'])) {
         $extra['data-error'] = $extra['error'];
-        unset($extra['error']);
     }
-    unset($extra['element_classes']);
-    $attr_str = get_attributes($extra);
+    $attrStr = get_attributes($extra);
 
     // $extra_params = '';
     // if($type == 'number') {
@@ -299,7 +242,7 @@ function form_text($name, $value = '', $extra = array()) {
     if(!empty($validation['required'])) {
         $return .= "<div class='d-flex position-relative validation-group'>";
     }
-    $return .= "<input type='text' id='".$id."' name='".$name."' class='form-control ".$element_classes."' value='".$value."' ".$attr_str." />";
+    $return .= "<input type='text' id='".$id."' name='".$name."' class='form-control ".$elementClasses."' value='".$value."' ".$attrStr." />";
     if(!empty($validation['required'])) {
         $return .= "</div>";
     }
@@ -314,24 +257,22 @@ function form_password($name, $value = '', $extra = array()) {
         $id = $extra['id'];
     }
 
-    $element_classes = '';
-    $element_classes = $extra['element_classes'];
+    $elementClasses = '';
+    $elementClasses = $extra['element_classes'];
     $validation = $extra['validation'];
     if(!empty($validation)) {
-        unset($extra['validation']);
         if($validation) {
             foreach ($validation as $key => $value1) {
                 $extra['data-validation-'.$key] = $value1;
             }
         }
     }
-    unset($extra['element_classes']);
-    $attr_str = get_attributes($extra);
+    $attrStr = get_attributes($extra);
 
     if(!empty($validation['required'])) {
         $return .= "<div class='d-flex position-relative validation-group'>";
     }
-    $return .= "<input type='password' id='".$id."' name='".$name."' class='form-control ".$element_classes."' value='".$value."' ".$attr_str." />";
+    $return .= "<input type='password' id='".$id."' name='".$name."' class='form-control ".$elementClasses."' value='".$value."' ".$attrStr." />";
     if(!empty($validation['required'])) {
         $return .= "</div>";
     }
@@ -345,10 +286,10 @@ function form_file($name, $value = '', $extra = array()) {
     if(!empty($extra['id'])) {
         $id = $extra['id'];
     }
-    $attr_str = get_attributes($extra);
+    $attrStr = get_attributes($extra);
 
     $return .= '<div class="upload_file_div">';
-    $return .= '<input type="file" class="form-hide" id="'.$id.'" '.$attr_str.' data-filename="'.$value.'">';
+    $return .= '<input type="file" class="form-hide" id="'.$id.'" '.$attrStr.' data-filename="'.$value.'">';
     $return .= '<input type="hidden" name="'.$name.'" value="'.$value.'">';
     $return .= '<div><button type="button" class="btn btn-success upload_file" data-trigger="#'.$id.'">
                     <i class="fa fa-upload pa-icon"></i>
@@ -376,18 +317,49 @@ function form_switchbutton($name, $value = '', $extra = array()) {
     if(!empty($extra['id'])) {
         $id = $extra['id'];
     }
-    $element_classes = $extra['element_classes'];
-    unset($extra['element_classes']);
-    $attr_str = get_attributes($extra);
+    $elementClasses = $extra['element_classes'];
+    $attrStr = get_attributes($extra);
 
     $extra_params = '';
     if($value) {
         $extra_params .= ' checked';
     }
     $return .= '<div class="switch">
-                    <input id="'.$id.'" class="cmn-toggle cmn-toggle-round '.$element_classes.'" '.$extra_params.' type="checkbox" name="'.$name.'" value="1" '.$attr_str.'>
+                    <input id="'.$id.'" class="cmn-toggle cmn-toggle-round '.$elementClasses.'" '.$extra_params.' type="checkbox" name="'.$name.'" value="1" '.$attrStr.'>
                     <label for="'.$id.'"></label>
                 </div>';
+    return $return;
+}
+
+function form_label($name, $value = '', $extra = array()) {
+    $return = '';
+
+    $id = $name;
+    if(!empty($extra['id'])) {
+        $id = $extra['id'];
+    }
+
+    $elementClasses = $extra['element_classes'];
+    $attrStr = get_attributes($extra);
+
+    $return .= '<label for="'.$id.'" class="m-0 '.$elementClasses.'" '.$attrStr.'>'.$value.'</label>';
+    return $return;
+}
+
+function form_select($name, $value = '', $extra = array()) {
+    $return = '';
+
+    $id = $name;
+    if(!empty($extra['id'])) {
+        $id = $extra['id'];
+    }
+    $list = $extra['list'];
+    $attrStr = get_attributes($extra);
+    $elementClasses = $extra['element_classes'];
+
+    $return .= '<select class="selectpicker '.$elementClasses.'" '.$extra['attributes'].' id="'.$id.'" name="'.$name.' '.$attrStr.'">';
+    $return .= draw_options($list, $extra['value_field'], $extra['text_field'], $value, $extra['list_before']);
+    $return .= '<select>';
     return $return;
 }
 
@@ -412,15 +384,46 @@ function form_hidden($name, $value = '', $extra_param = array()) {
 }
 
 function form_button($type, $title, $classes, $extra_params = array()) {
-    $attr_str = get_attributes($extra_params);
-    $return = '<button type="'.$type.'" class="btn '.$classes.'" '.$attr_str.'>'.$title.'</button>';
+    $attrStr = get_attributes($extra_params);
+    $return = '<button type="'.$type.'" class="btn '.$classes.'" '.$attrStr.'>'.$title.'</button>';
     return $return;
 }
 
 function get_attributes($extra) {
+    unset($extra['list']);
+    unset($extra['list_before']);
+    unset($extra['value_field']);
+    unset($extra['text_field']);
+    unset($extra['element_classes']);
+    unset($extra['validation']);
+    unset($extra['error']);
     $return = '';
     foreach ($extra as $key => $value) {
         $return .= " $key='$value' ";
     }
     return $return;
+}
+
+function getExtraClasses($classname) {
+    global $labelColClass;
+    if($labelColClass == '') {
+        $labelColClass = 3;
+    }
+    switch ($classname) {
+        case 'mini':
+            return array('label'=>$labelColClass, 'input'=>1);
+            break;
+        case 'small':
+            return array('label'=>$labelColClass, 'input'=>3);
+            break;
+        case 'medium':
+            return array('label'=>$labelColClass, 'input'=>5);
+            break;
+        case 'large':
+            return array('label'=>$labelColClass, 'input'=>9);
+            break;
+        default:
+            return array('label'=>$labelColClass, 'input'=>7);
+            break;
+    }
 }

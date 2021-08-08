@@ -18,26 +18,62 @@
                 <div class="card-body">
                     <div class="row no-gutters">
                         <div class="col-12 col-md-6">
-                            <?php echo form_element(COMMON_FIRSTNAME, 'text', 'firstname', $passenger_data['firstname'], array('validation'=>$validation, 'error'=>$err['firstname'])) ?>
+                            <?php echo form_element(COMMON_FIRSTNAME, 'text', 'firstname', $passengerData['firstname'], '', array('validation'=>$validation, 'error'=>$err['firstname'])) ?>
                         </div>
                         <div class="col-12 col-md-6">
-                            <?php echo form_element(COMMON_LASTNAME, 'text', 'lastname', $passenger_data['lastname'], array('validation'=>$validation, 'error'=>$err['lastname'])) ?>
-                        </div>
-                    </div>
-                    <div class="row no-gutters">
-                        <div class="col-12 col-md-6">
-                            <?php echo form_element(COMMON_EMAIL_ADDRESS, 'text', 'email', $passenger_data['email'], array('validation'=>array_merge($validation,$email), 'error'=>$err['email'])) ?>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <?php echo form_element(COMMON_PASSWORD, 'password', 'password', $passenger_data['password'], array('validation'=>$validation, 'error'=>$err['password'])) ?>
+                            <?php echo form_element(COMMON_LASTNAME, 'text', 'lastname', $passengerData['lastname'], '', array('validation'=>$validation, 'error'=>$err['lastname'])) ?>
                         </div>
                     </div>
                     <div class="row no-gutters">
                         <div class="col-12 col-md-6">
-                            <?php echo form_element(COMMON_PHONE_NUMBER, 'text', 'phone', $passenger_data['phone'], array('validation'=>array_merge($validation,$phone), 'error'=>$err['phone'])) ?>
+                            <?php echo form_element(COMMON_EMAIL_ADDRESS, 'text', 'email', $passengerData['email'], '', array('validation'=>array_merge($validation,$email), 'error'=>$err['email'])) ?>
                         </div>
                         <div class="col-12 col-md-6">
-                            <?php echo form_element(COMMON_STATUS, 'switchbutton', 'status', $passenger_data['status']) ?>
+                            <?php echo form_element(COMMON_PASSWORD, 'password', 'password', $passengerData['password'], '', array('validation'=>$validation, 'error'=>$err['password'])) ?>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="col-12 col-md-6">
+                            <?php echo form_element(COMMON_PHONE_NUMBER, 'text', 'phone', $passengerData['phone'], '', array('validation'=>array_merge($validation,$phone), 'error'=>$err['phone'])) ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <?php echo form_element(COMMON_STATUS, 'switchbutton', 'status', $passengerData['status'], '') ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="according accordion-s3 gradiant-bg mt-3">
+        <div class="card">
+            <div class="card-header">
+                <a class="card-link" data-toggle="collapse" href="#frm_passenger_reg_address" aria-expanded="true"><?php echo COMMON_ADDRESS_DETAILS ?></a>
+            </div>
+            <div id="frm_passenger_reg_address" class="collapse show">
+                <div class="card-body">
+                    <div class="row no-gutters">
+                        <div class="col-12 col-md-6">
+                            <?php
+                                echo form_hidden('country', $passengerData['country']);
+                                echo form_element(COMMON_COUNTRY, 'label', '', $passengerData['country_name']);
+                            ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <?php
+                                echo form_hidden('state', $passengerData['state']);
+                                echo form_element(COMMON_STATE, 'label', '', $passengerData['state_name']);
+                            ?>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="col-12 col-md-6">
+                            <?php
+                                echo form_hidden('city', $passengerData['city']);
+                                echo form_element(COMMON_CITY, 'label', '', $passengerData['city_name']);
+                            ?>
+                        </div>
+                        <div class="col-12 col-md-6 bus_stop_div">
                         </div>
                     </div>
                 </div>
@@ -45,8 +81,11 @@
         </div>
     </div>
 </form>
+<script>
+    var FILE_ADMIN_PASSENGER_EDIT = "<?php echo FILE_ADMIN_PASSENGER_EDIT ?>";
+</script>
 <?php
-$global_js .= <<<JS
-$("#form_add_passenger").validate();
+$globalJs .= <<<JS
+    $("#form_add_passenger").validate();
 JS;
 ?>

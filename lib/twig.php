@@ -13,22 +13,17 @@ $twig->registerUndefinedFunctionCallback(function ($name) {
     }
     return false;
 });
-// $twig->addFunction(new \Twig\TwigFunction('var_dump', function($param) {
-//     echo $param;
-// }));
 
-// echo '<pre>'; print_r(get_defined_functions()); echo '</pre>';
-$php_function = get_defined_functions();
+$twig->addGlobal('twc', $twc);
+$phpFunction = get_defined_functions();
 
-foreach ($php_function['internal'] as $key => $value) {
+foreach ($phpFunction['internal'] as $key => $value) {
     $filter = new \Twig\TwigFilter($value, $value);
     $twig->addFilter($filter);
 }
-foreach ($php_function['user'] as $key => $value) {
+foreach ($phpFunction['user'] as $key => $value) {
     $filter = new \Twig\TwigFilter($value, $value);
     $twig->addFilter($filter);
 }
-
-
 
 $twd = array();

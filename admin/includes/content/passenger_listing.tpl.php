@@ -21,7 +21,7 @@
     </table>
 </div>
 <?php
-$global_js .= <<<JS
+$globalJs .= <<<JS
     $("#dataTable").PATable({
         tabletools: true,
         tablebuttons: ['print', 'export'],

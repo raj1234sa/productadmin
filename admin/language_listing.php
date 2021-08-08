@@ -23,7 +23,7 @@ if($action == 'change_status') {
     exit;
 }
 
-if($is_ajax_request && ($listing_data || $export)) {
+if($isAjaxRequest && ($listing_data || $export)) {
     extract(extract_search_fields(), EXTR_PREFIX_ALL, 'SC');
 
     $siteLanguageMaster->setLimit($SC_start, $SC_length);
@@ -43,7 +43,7 @@ if($is_ajax_request && ($listing_data || $export)) {
         $export_structure[] = array('language_name'=>array('name'=>'language_name', 'title'=>COMMON_LANGUAGE_NAME));
         $export_structure[] = array('status'=>array('name'=>'status', 'title'=>COMMON_STATUS));
 
-        $sheetTitle = $page_title;
+        $sheetTitle = $pageTitle;
         $headerDate = "All";
         $spreadsheet = export_file_generate($export_structure, $siteLanguages);
         echo json_encode(export_report($spreadsheet, 'export_languages.xlsx'));
@@ -95,10 +95,10 @@ if($is_ajax_request && ($listing_data || $export)) {
     exit;
 }
 
-$breadcrumb_arr = array(
-    $breadcrumb_home,
+$breadcrumbArr = array(
+    $breadcrumbHome,
     array(
-        'title' => $page_title,
+        'title' => $pageTitle,
         // 'link' => DIR_HTTP_ADMIN.FILE_ADMIN_USER_LISTING
     ),
 );

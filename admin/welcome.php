@@ -17,8 +17,8 @@ use PHPMailer\PHPMailer\Exception;
 $mail = new PHPMailer(true);
 
 
-$breadcrumb_arr = array(
-    $breadcrumb_home
+$breadcrumbArr = array(
+    $breadcrumbHome
 );
 
 require_once(DIR_WS_ADMIN_INCLUDES.FILE_MAIN_INTERFACE);

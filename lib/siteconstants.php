@@ -1,19 +1,28 @@
 <?php
 
+$siteSettingsMaster = new SiteSettingsMaster();
+
+$siteSettingsData = $siteSettingsMaster->getSiteSetting();
+$siteSettingsData = objectToArray($siteSettingsData);
+foreach ($siteSettingsData as $setting) {
+    $selectedValue = (!empty($setting['set_value'])) ? $setting['set_value'] : $setting['default_value'];
+    define($setting['setting_constant'], $selectedValue);
+}
+
 $websiteLogoData = getWebsiteLogos();
 
 if(!empty($websiteLogoData)) {
-    $site_logo = $websiteLogoData['site_logo'];
-    $site_favicon = $websiteLogoData['site_favicon'];
+    $siteLogo = $websiteLogoData['site_logo'];
+    $siteFavicon = $websiteLogoData['site_favicon'];
 
-    if(!empty($site_logo) && file_exists(DIR_WS_WEBSITE_LOGOS.$site_logo) && is_file(DIR_WS_WEBSITE_LOGOS.$site_logo))
-        define('SITE_LOGO', DIR_HTTP_WEBSITE_LOGOS.$site_logo);
+    if(!empty($siteLogo) && file_exists(DIR_WS_WEBSITE_LOGOS.$siteLogo) && is_file(DIR_WS_WEBSITE_LOGOS.$siteLogo))
+        define('SITE_LOGO', DIR_HTTP_WEBSITE_LOGOS.$siteLogo);
     else
         define('SITE_LOGO', '');
 
-    if(!empty($site_favicon) && file_exists(DIR_WS_WEBSITE_LOGOS.$site_favicon) && is_file(DIR_WS_WEBSITE_LOGOS.$site_favicon)) {
-        define('SITE_FAVICON', DIR_HTTP_WEBSITE_LOGOS.$site_favicon);
-        define('SITE_FAVICON_EXT', pathinfo($site_favicon, PATHINFO_EXTENSION));
+    if(!empty($siteFavicon) && file_exists(DIR_WS_WEBSITE_LOGOS.$siteFavicon) && is_file(DIR_WS_WEBSITE_LOGOS.$siteFavicon)) {
+        define('SITE_FAVICON', DIR_HTTP_WEBSITE_LOGOS.$siteFavicon);
+        define('SITE_FAVICON_EXT', pathinfo($siteFavicon, PATHINFO_EXTENSION));
     }
     else {
         define('SITE_FAVICON', '');

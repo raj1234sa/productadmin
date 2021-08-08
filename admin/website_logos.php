@@ -46,12 +46,12 @@ if(!empty($submit)) {
     }
     show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_WEBSITE_LOGOS);
 }
-$heading_label = $page_title;
+$headingLabel = $pageTitle;
 
-$breadcrumb_arr = array(
-    $breadcrumb_home,
+$breadcrumbArr = array(
+    $breadcrumbHome,
     array(
-        'title' => $page_title
+        'title' => $pageTitle
     ),
 );
 

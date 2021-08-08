@@ -1,5 +1,5 @@
 <?php
-$admin_css_arr['global'] = array(
+$adminCssArr['global'] = array(
     DIR_HTTP_THIRDPARTY_CSS.'bootstrap.min.css',
     DIR_HTTP_THIRDPARTY_CSS.'font-awesome.min.css',
     DIR_HTTP_THIRDPARTY_CSS.'themify-icons.css',
@@ -11,13 +11,16 @@ $admin_css_arr['global'] = array(
     DIR_HTTP_THIRDPARTY_CSS.'styles.css',
     DIR_HTTP_THIRDPARTY_CSS.'responsive.css',
     DIR_HTTP_THIRDPARTY_CSS.'jquery.dataTables.css',
+    DIR_HTTP_THIRDPARTY_CSS.'buttons.dataTables.min.css',
     DIR_HTTP_THIRDPARTY_CSS.'image-zoom.css',
+    DIR_HTTP_THIRDPARTY_CSS.'bootstrap-select.min.css',
     DIR_HTTP_THIRDPARTY_JS.'modernizr-2.8.3.min.js',
     DIR_HTTP_ADMIN_CSS.'admin.css',
 );
 
-function addCss($admin_css_arr) {
-    foreach ($admin_css_arr['global'] as $value) {
+function addCss($adminCssArr) {
+    global $adminCssArr;
+    foreach ($adminCssArr['global'] as $value) {
         if(pathinfo($value, PATHINFO_EXTENSION) == 'js') {
             echo "<script src='".$value."?".time()."'></script>";
         } else {

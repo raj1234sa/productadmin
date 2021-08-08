@@ -1,12 +1,22 @@
 <?php
 
-function getPassengerDetails($user_details, $format = 'html') {
+function getPassengerDetails($userDetails, $format = 'html') {
     $return = '';
     $separator = ($format == 'html') ? "<br>" : "\n";
 
-    $return .= $user_details['firstname'].' '.$user_details['lastname'];
-    $return .= $separator."<a href='mailto:".$user_details['email']."'>".$user_details['email']."</a>";
-    $return .= $separator."<strong>".COMMON_PHONE_NUMBER." : </strong>".$user_details['phone'];
+    $return .= $userDetails['firstname'].' '.$userDetails['lastname'];
+    $return .= $separator."<a href='mailto:".$userDetails['email']."'>".$userDetails['email']."</a>";
+    $return .= $separator."<strong>".COMMON_PHONE_NUMBER." : </strong>".$userDetails['phone'];
+
+    return $return;
+}
+
+function getEmailSubjectDetails($emailDetails, $format = 'html') {
+    $return = '';
+    $separator = ($format == 'html') ? "<br>" : "\n";
+
+    $return .= $emailDetails['constant_name'];
+    $return .= $separator."<strong>".COMMON_SUBJECT." : </strong>".$emailDetails['template_subject'];
 
     return $return;
 }

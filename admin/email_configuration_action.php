@@ -10,65 +10,58 @@ $action = requestValue('action');
 $temp_id = requestValue('template_id');
 
 if(!empty($submit)) {
-    var_dump(str_replace('&', '&amp;', $_REQUEST['template_content'])); exit;
-    $firstname = postValue('firstname');
-    $lastname = postValue('lastname');
-    $email = postValue('email');
-    $password = postValue('password');
-    $phone = postValue('phone');
+    $template_subject = postValue('template_subject');
+    $template_content = htmlentities(postValue('template_content'));
     $status = postValue('status');
 
     $err = array();
-    $err['firstname'] = checkEmpty($firstname, COMMON_VALIDATE_REQUIRED);
-    $err['lastname'] = checkEmpty($lastname, COMMON_VALIDATE_REQUIRED);
-    $err['email'] = checkEmpty($email, COMMON_VALIDATE_REQUIRED);
-    $err['password'] = checkEmpty($password, COMMON_VALIDATE_REQUIRED);
-    $err['phone'] = checkEmpty($phone, COMMON_VALIDATE_REQUIRED);
+    $err['template_subject'] = checkEmpty($template_subject, COMMON_VALIDATE_REQUIRED);
+    $err['template_content'] = checkEmpty($template_content, COMMON_VALIDATE_REQUIRED);
 
-    if(empty($err['email'])) {
-        $err['email'] = checkEmailPattern($email, COMMON_INVALID_EMAIL);
-    }
-    if(empty($err['phone'])) {
-        $err['phone'] = checkPhoneNumber($phone, COMMON_INVALID_PHONE);
-    }
     $validation = checkValidation($err);
 
     if($validation) {
         $objEmailConfigurationData = new EmailConfigurationData();
-        $objEmailConfigurationData->firstname = $firstname;
-        $objEmailConfigurationData->lastname = $lastname;
-        $objEmailConfigurationData->email = $email;
-        $objEmailConfigurationData->password = $password;
-        $objEmailConfigurationData->phone = $phone;
         $objEmailConfigurationData->status = !empty($status) ? '1' : '0';
 
         if($action == 'edit') {
-            $objEmailConfigurationData->passenger_id = $pid;
-            if($objEmailConfigurationMaster->editEmailConfiguration($objEmailConfigurationData)) {
+            $objEmailConfigurationData->email_template_id = $temp_id;
+            $edit_success = $objEmailConfigurationMaster->editEmailConfiguration($objEmailConfigurationData);
+            $objEmailConfigurationData->email_template_id = $temp_id;
+            $objEmailConfigurationData->template_subject = $template_subject;
+            $objEmailConfigurationData->template_content = $template_content;
+            $objEmailConfigurationData->language_id = '1';
+            $edit_success1 = $objEmailConfigurationMaster->editEmailConfigurationDesc($objEmailConfigurationData);
+            if($edit_success && $edit_success1) {
                 set_flash_message(COMMON_UPDATE_SUCCESS, 'success');
             } else {
                 set_flash_message(COMMON_UPDATE_ERROR, 'danger');
             }
         } else {
-            $pid = $objEmailConfigurationMaster->addEmailConfiguration($objEmailConfigurationData);
-            if($pid > 0) {
+            $temp_id = $objEmailConfigurationMaster->addEmailConfiguration($objEmailConfigurationData);
+            $objEmailConfigurationData->email_template_id = $temp_id;
+            $objEmailConfigurationData->template_subject = $template_subject;
+            $objEmailConfigurationData->template_content = $template_content;
+            $objEmailConfigurationData->language_id = '1';
+            $added = $objEmailConfigurationMaster->addEmailConfigurationDesc($objEmailConfigurationData);
+            if($temp_id > 0 && $added > 0) {
                 set_flash_message(COMMON_INSERT_SUCCESS, 'success');
             } else {
                 set_flash_message(COMMON_INSERT_ERROR, 'danger');
             }
         }
-        if(!empty($pid)) {
+        if(!empty($temp_id)) {
             if($submit == COMMON_SAVE) {
-                show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_PASSENGER_EDIT.'?action=edit&passenger_id='.$pid);
+                show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_EDIT.'?action=edit&template_id='.$temp_id);
             } elseif($submit == COMMON_SAVE_BACK) {
-                show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_PASSENGER_LISTING);
+                show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_LISTING);
             }
         }
     }
 }
 
 if(!empty($temp_id)) {
-    $email_config_data = $objEmailConfigurationMaster->getEmailConfiguration($temp_id);
+    $email_config_data = $objEmailConfigurationMaster->getEmailConfiguration($temp_id, 'yes');
     if(!empty($email_config_data)) {
         $email_config_data = $email_config_data[0];
     } else {
@@ -76,21 +69,21 @@ if(!empty($temp_id)) {
         show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_LISTING);
     }
 }
-$heading_label = $page_title;
-$page_title = !empty($temp_id) ? EDIT_EMAIL_CONFIGURATION : ADD_EMAIL_CONFIGURATION;
-$heading_label = $page_title;
+$headingLabel = $pageTitle;
+$pageTitle = !empty($temp_id) ? EDIT_EMAIL_CONFIGURATION : ADD_EMAIL_CONFIGURATION;
+$headingLabel = $pageTitle;
 if(!empty($temp_id)) {
-    $heading_label .= "<small>".$email_config_data['template_subject']."</small>";
+    $headingLabel .= "<small>".$email_config_data['template_subject']."</small>";
 }
 
-$breadcrumb_arr = array(
-    $breadcrumb_home,
+$breadcrumbArr = array(
+    $breadcrumbHome,
     array(
         'link' => DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_LISTING,
         'title' => COMMON_EMAIL_CONFIGURATION,
     ),
     array(
-        'title' => $page_title,
+        'title' => $pageTitle,
     ),
 );
 

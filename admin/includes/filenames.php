@@ -21,4 +21,6 @@ define('FILE_ADMIN_LANGUAGE_EDIT', 'language_action.php');
 define('FILE_ADMIN_EMAIL_CONFIG_LISTING', 'email_configuration.php');
 define('FILE_ADMIN_EMAIL_CONFIG_EDIT', 'email_configuration_action.php');
 
+define('FILE_ADMIN_SITE_SETTINGS_LISTING', 'site_settings.php');
+
 ?>

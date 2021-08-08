@@ -1,0 +1,5 @@
+<?php
+
+$SITE_VAR_ENCRYPTION_METHOD = 'md5';
+
+$SITE_VAR_ENCRYPTION_KEY = '5546dsaihcaf6s562h';

@@ -2,13 +2,27 @@
 
 require_once('../lib/common.php');
 require_once(DIR_WS_MODEL.'PassengersMaster.php');
+require_once(DIR_WS_MODEL.'BusStopsMaster.php');
 
 $objPassengersMaster = new PassengersMaster();
+$objBusStopsMaster = new BusStopsMaster();
 
 $submit = postValue('submit_btn');
 $action = requestValue('action');
 $pid = requestValue('passenger_id');
 
+if($action == 'get_bus_stops') {
+    $busStopsData = $objBusStopsMaster->getBusStops();
+    if(!empty($busStopsData)) {
+        $busStopsData = objectToArray($busStopsData);
+        echo form_element('Bus Stop', 'select', 'bus_stop', '', '', array('list'=>$busStopsData, 'value_field'=>'stop_id', 'text_field'=>'stop_title'));
+    } else {
+        echo form_element('Bus Stop', 'select', 'bus_stop', '', '', array('list_before'=>'<select>Select Bus Stop</select>'));
+    }
+    exit;
+}
+
+// Add/Edit Passenger data
 if(!empty($submit)) {
     $firstname = postValue('firstname');
     $lastname = postValue('lastname');
@@ -17,6 +31,7 @@ if(!empty($submit)) {
     $phone = postValue('phone');
     $status = postValue('status');
 
+    // Validation start
     $err = array();
     $err['firstname'] = checkEmpty($firstname, COMMON_VALIDATE_REQUIRED);
     $err['lastname'] = checkEmpty($lastname, COMMON_VALIDATE_REQUIRED);
@@ -31,6 +46,7 @@ if(!empty($submit)) {
         $err['phone'] = checkPhoneNumber($phone, COMMON_INVALID_PHONE);
     }
     $validation = checkValidation($err);
+    // Validation end
 
     if($validation) {
         $objPassengersData = new PassengersData();
@@ -66,30 +82,54 @@ if(!empty($submit)) {
     }
 }
 
+// Get passenger data
 if(!empty($pid)) {
-    $passenger_data = $objPassengersMaster->getPassenger($pid);
-    if(!empty($passenger_data)) {
-        $passenger_data = $passenger_data[0];
+    $passengerData = $objPassengersMaster->getPassenger($pid);
+    if(!empty($passengerData)) {
+        $passengerData = $passengerData[0];
     } else {
         set_flash_message(COMMON_RECORD_NOT_EXISTS, 'fail');
         show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_PASSENGER_LISTING);
     }
 }
 
-$page_title = !empty($pid) ? EDIT_PASSENGER : ADD_PASSENGER;
-$heading_label = $page_title;
-if(!empty($pid)) {
-    $heading_label .= "<small>".$passenger_data['firstname'].' '.$passenger_data['lastname']."</small>";
+$objUtilMaster = new UtilMaster();
+$getCountries = $objUtilMaster->exec_query('SELECT * FROM countries');
+if($getCountries->RecordCount() <= 1) {
+    $getCountries = $getCountries[0];
+    $passengerData['country'] = $getCountries['country_id'];
+    $passengerData['country_name'] = $getCountries['country_name'];
 }
 
-$breadcrumb_arr = array(
-    $breadcrumb_home,
+$getStates = $objUtilMaster->exec_query('SELECT * FROM states');
+if($getStates->RecordCount() <= 1) {
+    $getStates = $getStates[0];
+    $passengerData['state'] = $getStates['state_id'];
+    $passengerData['state_name'] = $getStates['state_name'];
+}
+
+$getCities = $objUtilMaster->exec_query('SELECT * FROM cities');
+if($getCities->RecordCount() <= 1) {
+    $getCities = $getCities[0];
+    $passengerData['city'] = $getCities['city_id'];
+    $passengerData['city_name'] = $getCities['city_name'];
+}
+
+$pageTitle = !empty($pid) ? EDIT_PASSENGER : ADD_PASSENGER;
+$headingLabel = $pageTitle;
+if(!empty($pid)) {
+    $headingLabel .= "<small>".$passengerData['firstname'].' '.$passengerData['lastname']."</small>";
+}
+
+// Set breadcrub array
+$breadcrumbArr = array(
+    $breadcrumbHome,
     array(
         'link' => DIR_HTTP_ADMIN.FILE_ADMIN_PASSENGER_LISTING,
         'title' => COMMON_PASSENGERS,
     ),
     array(
-        'title' => $page_title,
+        'title' => $pageTitle,
     ),
 );
 

@@ -6,7 +6,7 @@
         <title>Login :: Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" type="image/<?php echo SITE_FAVICON_EXT ?>" href="<?php echo SITE_FAVICON ?>">
-        <?php addCss($admin_css_arr) ?>
+        <?php addCss($adminCssArr) ?>
     </head>
     <body>
         <!-- <div id="preloader">
@@ -15,7 +15,7 @@
         <div class="login-area">
             <div class="container">
                 <div class="login-box ptb--100">
-                    <form method="POST">
+                    <form method="POST" id="admin_login_frm">
                         <div class="login-form-head">
                             <h4><?php echo COMMON_SIGNIN; ?></h4>
                         </div>
@@ -23,8 +23,8 @@
                             <?php
                                 $label_col_class = 0;
                                 $validation = array('required'=>COMMON_VALIDATE_REQUIRED);
-                                echo form_element('', 'text', 'admin_username', '', array('placeholder'=>COMMON_USERNAME, 'validation'=>$validation, 'error'=>$err['username']));
-                                echo form_element('', 'password', 'admin_password', '', array('placeholder'=>COMMON_PASSWORD, 'validation'=>$validation));
+                                echo form_element('', 'text', 'admin_username', '', '', array('placeholder'=>COMMON_USERNAME, 'validation'=>$validation, 'error'=>$err['username']));
+                                echo form_element('', 'password', 'admin_password', '', '', array('placeholder'=>COMMON_PASSWORD, 'validation'=>$validation));
                                 echo form_hidden('backurl', getValue('backurl'));
                             ?>
                             <div class="row mb-4 rmber-area justify-content-end">
@@ -42,6 +42,9 @@
                 </div>
             </div>
         </div>
-        <?php addJs($admin_js_arr) ?>
+        <?php addJs() ?>
+        <script>
+            $("#admin_login_frm").validate();
+        </script>
     </body>
 </html>

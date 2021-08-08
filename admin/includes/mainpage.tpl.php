@@ -3,10 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title><?php echo $page_title; ?> :: Admin</title>
+        <title><?php echo $pageTitle; ?> :: Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" type="image/<?php echo SITE_FAVICON_EXT ?>" href="<?php echo SITE_FAVICON ?>">
-        <?php addCss($admin_css_arr) ?>
+        <?php addCss($adminCssArr) ?>
     </head>
     <body>
         <div class="alert-dismiss"></div>
@@ -29,10 +29,10 @@
                             </div>
                             <ul class="breadcrumbs pull-left pr-3">
                                 <?php
-                                if(!empty($breadcrumb_arr)) {
-                                    $breadcrumb_arr = array_filter($breadcrumb_arr);
-                                    if(count($breadcrumb_arr) == 1) { unset($breadcrumb_arr[0]['link']); }
-                                    foreach ($breadcrumb_arr as $key => $value) {
+                                if(!empty($breadcrumbArr)) {
+                                    $breadcrumbArr = array_filter($breadcrumbArr);
+                                    if(count($breadcrumbArr) == 1) { unset($breadcrumbArr[0]['link']); }
+                                    foreach ($breadcrumbArr as $key => $value) {
                                         if(!empty($value)) {
                                             if(isset($value['link'])) {
                                                 echo '<li><a href="'.$value['link'].'">'.$value['title'].'</a></li>';
@@ -65,7 +65,7 @@
                     <div class="row align-items-center">
                         <div class="col-9 col-md-10">
                             <div class="heading-area">
-                                <h4 class="page-title pull-left"><?php echo $heading_label; ?></h4>
+                                <h4 class="page-title pull-left"><?php echo $headingLabel; ?></h4>
                             </div>
                             <i class="fa fa-refresh fa-spin d-none ajax_loader"></i>
                         </div>
@@ -102,7 +102,7 @@
             <!-- footer area end-->
         </div>
         <!-- page container area end -->
-        <?php addJs($admin_js_arr) ?>
-        <script><?php echo $global_js; ?></script>
+        <?php addJs() ?>
+        <script><?php echo $globalJs; ?></script>
     </body>
 </html>

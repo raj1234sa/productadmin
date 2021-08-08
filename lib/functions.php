@@ -150,16 +150,16 @@ function generateFileName($filename) {
     $filename = str_replace(' ', '_', $filename);
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
     $filename = pathinfo($filename, PATHINFO_FILENAME);
-    $return_filename = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $filename).'_'.time().'.'.$ext;
-    return $return_filename;
+    $returnFilename = preg_replace('/[^a-zA-Z0-9_ -]/s', '', $filename).'_'.time().'.'.$ext;
+    return $returnFilename;
 }
 
 function uploadFiles($destination, $element) {
     if(!empty($element)) {
         if(!empty($element)) {
-            $target_dir = $destination;
-            $target_file = $target_dir . basename($element["name"]);
-            if (move_uploaded_file($element["tmp_name"], $target_file)) {
+            $targetDir = $destination;
+            $targetFile = $targetDir . basename($element["name"]);
+            if (move_uploaded_file($element["tmp_name"], $targetFile)) {
                 return true;
             } else {
                 return false;
