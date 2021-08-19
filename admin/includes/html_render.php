@@ -79,7 +79,7 @@ function draw_action_menu($actionLinks) {
             if (isset($value['class'])) {
                 $class = $value['class'];
             }
-            $html .= "<a href='{$value['link']}' class='btn btn-sm $class'>
+            $html .= "<a href='{$value['link']}' data-toggle='tooltip' data-placement='top' title='".$key."' class='btn btn-sm $class'>
             <i class='{$value['icon']}'></i></a>";
             $count++;
         }
@@ -92,6 +92,7 @@ function draw_action_menu($actionLinks) {
 }
 
 function form_element($label, $type='text', $name, $value = '', $class = '', $extra = array()) {
+    global $label_col_class;
     $return = '';
     
     $id = $name;
@@ -99,8 +100,8 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
         $id = $extra['id'];
     }
 
-    $frmGrpClasses = '';
-    $frmGrpClasses = $extra['form_group_class'];
+    $frmGrpClasses = 'form-group row no-gutters';
+    $frmGrpClasses .= $extra['form_group_class'];
     if($type != 'switchbutton') {
         $frmGrpClasses .= ' pa-input';
     }
@@ -109,8 +110,15 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
 
     $labelColClass = $colClasses['label'];
     $elementColClass = $colClasses['input'];
+    if($label_col_class != '') {
+        $labelColClass = $label_col_class;
+    }
 
-    $return .= '<div class="form-group row no-gutters '.$frmGrpClasses.'">';
+    if($type == 'select') {
+        $frmGrpClasses = str_replace('form-group', '', $frmGrpClasses);
+    }
+
+    $return .= '<div class="'.$frmGrpClasses.'">';
     if(!empty($label)) {
         $return .= '<div class="col-12 col-md-'.$labelColClass.'"><label class="m-0 col-form-label" for="'.$id.'">'.$label.'</label></div>';
     } else {
@@ -128,6 +136,7 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
         case 'file':
         case 'label':
         case 'select':
+        case 'radio':
             array_shift($args);
             unset($args[2]);
             if($type == 'switchbutton') {
@@ -185,7 +194,8 @@ function form_ckeditor($name, $value = '', $extra = array()) {
     }
 
     $elementClasses = '';
-    $elementClasses = $extra['element_classes'];
+    $elementClasses = $extra['element_class'];
+    $frmGrpClasses = $extra['form_group_class'];
     $validation = $extra['validation'];
     if(!empty($validation)) {
         if($validation) {
@@ -200,7 +210,7 @@ function form_ckeditor($name, $value = '', $extra = array()) {
     $attrStr = get_attributes($extra);
     
     if(!empty($validation['required'])) {
-        $return .= "<div class='d-flex position-relative validation-group'>";
+        $return .= "<div class='validation-group $frmGrpClasses'>";
     }
     $return .= '<textarea name="'.$name.'" id="'.$id.'" class="form-ckeditor '.$elementClasses.'" '.$attrStr.'>';
     $return .= $value;
@@ -220,7 +230,8 @@ function form_text($name, $value = '', $extra = array()) {
     }
 
     $elementClasses = '';
-    $elementClasses = $extra['element_classes'];
+    $elementClasses = $extra['element_class'];
+    $frmGrpClasses = $extra['form_group_class'];
     $validation = $extra['validation'];
     if(!empty($validation)) {
         if($validation) {
@@ -240,7 +251,7 @@ function form_text($name, $value = '', $extra = array()) {
     //     $type = 'text';
     // }
     if(!empty($validation['required'])) {
-        $return .= "<div class='d-flex position-relative validation-group'>";
+        $return .= "<div class='validation-group $frmGrpClasses'>";
     }
     $return .= "<input type='text' id='".$id."' name='".$name."' class='form-control ".$elementClasses."' value='".$value."' ".$attrStr." />";
     if(!empty($validation['required'])) {
@@ -258,7 +269,8 @@ function form_password($name, $value = '', $extra = array()) {
     }
 
     $elementClasses = '';
-    $elementClasses = $extra['element_classes'];
+    $elementClasses = $extra['element_class'];
+    $frmGrpClasses = $extra['form_group_class'];
     $validation = $extra['validation'];
     if(!empty($validation)) {
         if($validation) {
@@ -270,7 +282,7 @@ function form_password($name, $value = '', $extra = array()) {
     $attrStr = get_attributes($extra);
 
     if(!empty($validation['required'])) {
-        $return .= "<div class='d-flex position-relative validation-group'>";
+        $return .= "<div class='validation-group $frmGrpClasses'>";
     }
     $return .= "<input type='password' id='".$id."' name='".$name."' class='form-control ".$elementClasses."' value='".$value."' ".$attrStr." />";
     if(!empty($validation['required'])) {
@@ -317,7 +329,7 @@ function form_switchbutton($name, $value = '', $extra = array()) {
     if(!empty($extra['id'])) {
         $id = $extra['id'];
     }
-    $elementClasses = $extra['element_classes'];
+    $elementClasses = $extra['element_class'];
     $attrStr = get_attributes($extra);
 
     $extra_params = '';
@@ -339,7 +351,7 @@ function form_label($name, $value = '', $extra = array()) {
         $id = $extra['id'];
     }
 
-    $elementClasses = $extra['element_classes'];
+    $elementClasses = $extra['element_class'];
     $attrStr = get_attributes($extra);
 
     $return .= '<label for="'.$id.'" class="m-0 '.$elementClasses.'" '.$attrStr.'>'.$value.'</label>';
@@ -355,11 +367,34 @@ function form_select($name, $value = '', $extra = array()) {
     }
     $list = $extra['list'];
     $attrStr = get_attributes($extra);
-    $elementClasses = $extra['element_classes'];
+    $elementClasses = $extra['element_class'];
 
-    $return .= '<select class="selectpicker '.$elementClasses.'" '.$extra['attributes'].' id="'.$id.'" name="'.$name.' '.$attrStr.'">';
+    $return .= '<select class="selectpicker '.$elementClasses.'" '.$extra['attributes'].' id="'.$id.'" name="'.$name.'" '.$attrStr.'">';
     $return .= draw_options($list, $extra['value_field'], $extra['text_field'], $value, $extra['list_before']);
     $return .= '<select>';
+    return $return;
+}
+
+function form_radio($name, $value = '', $extra = array()) {
+    $return = '';
+
+    $id = $name;
+    if(!empty($extra['id'])) {
+        $id = $extra['id'];
+    }
+    $list = $extra['list'];
+    $attrStr = get_attributes($extra);
+    $elementClasses = $extra['element_class'];
+
+    foreach ($list as $key => $field) {
+        $value_field = !isset($extra['value_field']) ? $key : $field[$extra['value_field']];
+        $text_field = !isset($extra['text_field']) ? $field : $field[$extra['text_field']];
+        $select = ($value == $value_field) ? "checked" : '';
+        $return .= '<div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" value="'.$value_field.'" id="'.$name.'_'.$key.'" name="'.$name.'" class="custom-control-input" '.$select.'>
+                        <label class="custom-control-label" for="'.$name.'_'.$key.'">'.$text_field.'</label>
+                    </div>';
+    }
     return $return;
 }
 
@@ -371,6 +406,18 @@ function draw_options($list, $value_field, $text_field, $selected, $before = nul
     foreach ($list as $value) {
         $select = ($selected == $value[$value_field]) ? "selected='selected'" : '';
         $html .= "<option value='" . $value[$value_field] . "' $select>" . $value[$text_field] . "</option>";
+    }
+    return $html;
+}
+
+function drawRadio($list, $value_field, $text_field, $selected) {
+    $html = '';
+    foreach ($list as $value) {
+        $select = ($selected == $value[$value_field]) ? "checked" : '';
+        $html .= '<div class="custom-control custom-radio">
+                    <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" '.$select.'>
+                    <label class="custom-control-label" for="customRadio1">'.$text_field.'</label>
+                </div>';
     }
     return $html;
 }
@@ -394,9 +441,11 @@ function get_attributes($extra) {
     unset($extra['list_before']);
     unset($extra['value_field']);
     unset($extra['text_field']);
-    unset($extra['element_classes']);
+    unset($extra['element_class']);
     unset($extra['validation']);
     unset($extra['error']);
+    unset($extra['selected']);
+    unset($extra['form_group_class']);
     $return = '';
     foreach ($extra as $key => $value) {
         $return .= " $key='$value' ";

@@ -130,6 +130,12 @@ function checkPhoneNumber($value, $msg) {
     }
 }
 
+function checkNumeric($value, $msg) {
+    if(!preg_match("/^[0-9]*$/", $value)) {
+        return $msg;
+    }
+}
+
 function checkValidation($err) {
     $validation = true;
     foreach ($err as $value) {

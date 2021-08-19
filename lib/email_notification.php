@@ -7,18 +7,45 @@ class EmailNotificaion {
         $this->mailObj = new PHPMailer(true);
     }
 
-    public function getVariables($emailKey) {
+    public function getVariables($emailKey, $recordId=null) {
+        require_once(DIR_WS_MODEL.'EmailConfigurationMaster.php');
+        $objEmailConfigurationMaster = new EmailConfigurationMaster();
         $objUtilMaster = new UtilMaster();
 
+        $objEmailConfigurationMaster->setWhere("AND constant_name = :constant_name", $emailKey, 'string');
+        $objEmailConfigurationMaster->setWhere("AND status = :status", '1', 'string');
+        $emailData = $objEmailConfigurationMaster->getEmailConfiguration();
+        if(empty($emailData)) {
+            return false;
+        }
+        $emailData = $emailData[0];
+
         $objUtilMaster->setFrom('email_variables');
-        $objUtilMaster->setJoin("LEFT JOIN email_configuration ON email_configuration.email_template_id = email_variables.email_template_id AND constant_name = :constant_name", $emailKey, 'int');
+        $objUtilMaster->setWhere("AND email_variables.email_template_id IN @email_template_id", array(0, $emailData['email_template_id']), 'int');
         $variablesData = $objUtilMaster->exec_query();
 
         $variablesArr = array();
         
         if(!empty($variablesData)) {
             foreach ($variablesData as $variable) {
-                $variablesArr[$variable['variable_name']] = '';
+                switch ($variable['pattern']) {
+                    case 'customer_name':
+                        require_once(DIR_WS_MODEL.'PassengersMaster.php');
+                        $objPassengersMaster = new PassengersMaster();
+
+                        $objPassengersMaster->setSelect($variable['columns_name']);
+                        $usersData = $objPassengersMaster->getPassenger($recordId);
+                        if(!empty($usersData)) {
+                            $usersData = $usersData[0];
+                            $variablesArr[$variable['variable_name']] = $usersData['firstname'].' '.$usersData['lastname'];
+                        } else {
+                            $variablesArr[$variable['variable_name']] = '';
+                        }
+                        break;
+                    default:
+                        $variablesArr[$variable['variable_name']] = '';
+                        break;
+                }
             }
         }
         return $variablesArr;
@@ -31,6 +58,7 @@ class EmailNotificaion {
         $emailConfig = array();
 
         $objEmailConfigurationMaster->setWhere("AND constant_name = :constant_name", $emailKey, 'string');
+        $objEmailConfigurationMaster->setWhere("AND status = :status", '1', 'string');
         $emailData = $objEmailConfigurationMaster->getEmailConfiguration(null, 'yes');
         if(empty($emailData)) {
             return false;

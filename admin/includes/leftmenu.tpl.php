@@ -54,7 +54,7 @@ if(defined('SITE_LOGO') && SITE_LOGO == '') {
                 <ul class="metismenu" id="menu">
                     <?php
                     foreach ($finalLeftMenuData as $section) {
-                        $menuData = $section['children'];
+                        $menuData = (isset($section['children'])) ? $section['children'] : array();
                         $section_title = $section['section_title'];
                         $section_icon = $section['section_icon'];
                         $section_url = empty($section['section_url']) ? 'javascript:void(0)' : $section['section_url'];

@@ -76,6 +76,11 @@ if(!empty($temp_id)) {
     $headingLabel .= "<small>".$email_config_data['template_subject']."</small>";
 }
 
+$objUtilMaster = new UtilMaster();
+$objUtilMaster->setFrom('email_variables');
+$objUtilMaster->setWhere("AND email_template_id IN @email_template_id", array(0, $email_config_data['email_template_id']), 'int');
+$emailVariablesData = $objUtilMaster->exec_query();
+
 $breadcrumbArr = array(
     $breadcrumbHome,
     array(

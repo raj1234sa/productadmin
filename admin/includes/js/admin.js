@@ -179,17 +179,17 @@ function failMessage(message) {
 //     });
 // });
 
-$(document).ajaxStart(function() {
+$(document).ajaxStart(function () {
     $("i.ajax_loader").removeClass('d-none');
-}).ajaxStop(function() {
+}).ajaxStop(function () {
     $("i.ajax_loader").addClass('d-none');
 });
 
-$.fn.PATable = function(options) {
+$.fn.PATable = function (options) {
     var FILE_FILENAME_WITH_EXT = window.location.href;
     var tableobj = $(this);
     var columnDefs = [];
-    if(typeof options.search !== undefined) {
+    if (typeof options.search !== undefined) {
         $("#filterForm select, #filterForm input, #filterForm button[type!=button]").each(function () {
             $.cookie("search_" + $(this).attr("id"), $(this).val());
         });
@@ -210,13 +210,13 @@ $.fn.PATable = function(options) {
             break;
         }
     }
-    $("thead tr th", tableobj).each(function(index, elem) {
-        if($(elem).data('default-sort') !== undefined && $(elem).data('default-sort') == true) {
+    $("thead tr th", tableobj).each(function (index, elem) {
+        if ($(elem).data('default-sort') !== undefined && $(elem).data('default-sort') == true) {
             var sort_dir = 'asc';
-            if($(elem).data('sort-dir') !== undefined && $(elem).data('sort-dir') != '') {
+            if ($(elem).data('sort-dir') !== undefined && $(elem).data('sort-dir') != '') {
                 sort_dir = $(elem).data('sort-dir');
             }
-            defaultSorting = [[index,sort_dir]];
+            defaultSorting = [[index, sort_dir]];
         }
     });
     $.extend(true, $.fn.dataTable.defaults, {
@@ -242,16 +242,16 @@ $.fn.PATable = function(options) {
         "searching": true,
         "bServerSide": true,
         "bStateSave": false,
-        "fnStateSaveCallback": function(settings,data) {
+        "fnStateSaveCallback": function (settings, data) {
             localStorage.setItem('DataTables_' + settings.sInstance, JSON.stringify(data))
         },
-        "fnStateLoadCallback": function(settings) {
+        "fnStateLoadCallback": function (settings) {
             return JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance))
         },
     });
 
     var opts = $.extend(true, $.fn.dataTable.defaults, options);
-    if(opts.serverSide != false) {
+    if (opts.serverSide != false) {
         opts.ajax = {
             "url": FILE_FILENAME_WITH_EXT,
             "type": "POST",
@@ -261,15 +261,15 @@ $.fn.PATable = function(options) {
         };
     }
 
-    opts.drawCallback = function(settings) {
-        if(options.tabletools) {
+    opts.drawCallback = function (settings) {
+        if (options.tabletools) {
             tablebuttons = options.tablebuttons;
-            if ($.inArray($("tbody").text(), [SC_NO_RECORDS_TABLE,SC_NO_RECORDS_FOUND]) == -1) {
+            if ($.inArray($("tbody").text(), [SC_NO_RECORDS_TABLE, SC_NO_RECORDS_FOUND]) == -1) {
                 var html = '';
                 if ($(".table-tools").html() == undefined) {
                     html += '<div class="table-tools">';
                 }
-                if(typeof tablebuttons !== 'undefined' && tablebuttons !== null) {
+                if (typeof tablebuttons !== 'undefined' && tablebuttons !== null) {
                     tablebuttons.forEach(element => {
                         if (element == 'print') {
                             var printHtml = '';
@@ -295,6 +295,7 @@ $.fn.PATable = function(options) {
         } else {
             $(".table-tools").remove();
         }
+        renderInputs();
     };
     var dataTable = tableobj.DataTable(opts);
     this.dataTable = dataTable;
@@ -309,11 +310,11 @@ $.fn.PATable = function(options) {
     // $(tableobj.parent().parent().parent()).delegate('button.print-btn', 'click', function () {
     //     print_table($(this), dataTable);
     // });
-    if(typeof options.search !== 'undefined') {
-        if(typeof options.search.button !== 'undefined') {
-            $(options.search.button).click(function() {
+    if (typeof options.search !== 'undefined') {
+        if (typeof options.search.button !== 'undefined') {
+            $(options.search.button).click(function () {
                 var table_obj = tableobj.data('PATable');
-                table_obj.settings()[0].ajax.data = function(data) {
+                table_obj.settings()[0].ajax.data = function (data) {
                     data.listing_data = true;
                     data.searchval = $(options.search.form).serialize();
                 }
@@ -328,125 +329,170 @@ $.fn.PATable = function(options) {
 
 $(document).ready(function () {
     $("body")
-    .delegate('input.change_status.ajax', 'change', function () {
-        var _this = $(this);
-        var table_obj = _this.parents('table').data('PATable');
-        var url = _this.data('url');
-        var id = _this.parent().parent().parent().attr('id').split(":")[1];
-        var statusCode = _this.attr("name");
-        var status = '0';
-        if (_this.prop('checked')) {
-            status = '1';
-        }
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: {id: id, status: status, status_code: statusCode, action: 'change_status'},
-            beforeSend: function () {
-                $(".alert.alert-dismissible").remove();
-            },
-            success: function (response) {
-                if (response == 'success') {
-                    successMessage("Status is changed successfully.");
-                } else {
-                    failMessage("Error while changing status.");
-                }
-            },
-            complete: function () {
-                table_obj.draw();
+        .delegate('input.change_status.ajax', 'change', function () {
+            var _this = $(this);
+            var table_obj = _this.parents('table').data('PATable');
+            var url = _this.data('url');
+            var id = _this.parent().parent().parent().attr('id').split(":")[1];
+            var statusCode = _this.attr("name");
+            var status = '0';
+            if (_this.prop('checked')) {
+                status = '1';
             }
-        });
-    })
-    .delegate('a.ajax.delete', 'click', function (e) {
-        e.preventDefault();
-        var _this = $(this);
-        var table_obj = _this.parents('table').data('PATable');
-        var atag = _this;
-        bootbox.confirm(COMMON_DELETE_WARNING, function (result) {
-            if (result) {
-                var url = $(atag).attr('href');
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    success: function (response) {
-                        if (response == 'success') {
-                            successMessage(COMMON_DELETE_SUCCESS);
-                        } else {
-                            failMessage(response);
-                        }
-                    },
-                    complete: function () {
-                        table_obj.draw();
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: { id: id, status: status, status_code: statusCode, action: 'change_status' },
+                beforeSend: function () {
+                    $(".alert.alert-dismissible").remove();
+                },
+                success: function (response) {
+                    if (response == 'success') {
+                        successMessage("Status is changed successfully.");
+                    } else {
+                        failMessage("Error while changing status.");
                     }
-                });
+                },
+                complete: function () {
+                    table_obj.draw();
+                }
+            });
+        })
+        .delegate('a.ajax.delete', 'click', function (e) {
+            e.preventDefault();
+            var _this = $(this);
+            var table_obj = _this.parents('table').data('PATable');
+            var atag = _this;
+            bootbox.confirm({
+                message: COMMON_DELETE_WARNING,
+                buttons: {
+                    cancel: {
+                        className: 'btn-secondary btn-default btn-sm'
+                    },
+                    confirm: {
+                        className: 'btn-primary btn-sm'
+                    }
+                },
+                callback: function (result) {
+                if (result) {
+                    var url = $(atag).attr('href');
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        success: function (response) {
+                            if (response == 'success') {
+                                successMessage(COMMON_DELETE_SUCCESS);
+                            } else {
+                                failMessage(response);
+                            }
+                        },
+                        complete: function () {
+                            table_obj.draw();
+                        }
+                    });
+                }
+            }});
+        })
+        .delegate('button.print-btn', 'click', function () {
+            var _this = $(this);
+            var table_obj = _this.parent().siblings('div').find('table').data('PATable');
+            window.printMode = true;
+            table_obj.draw();
+            $("#navbar").hide();
+            $("#breadcrumbs").hide();
+            $("#sidebar").hide();
+            $(".main-content").css('margin-left', "0");
+            $(".page-header").hide();
+            $("#filterForm").hide();
+            $(".table-tools").hide();
+            $(".dataTable_processing").hide();
+            $(".dataTables_length").hide();
+            $(".dataTables_paginate").hide();
+            $(".dataTables_info").hide();
+            $("div.footer").hide();
+            $(".sidebar-menu").hide();
+            $(".page-title-area").hide();
+            $(".header-area").hide();
+            $(".page-container").css('padding', "0");
+            $(".action-buttons-div").hide();
+            $("form").hide();
+        })
+        .delegate('.export-btn', 'click', function () {
+            var _this = $(this);
+            var table_obj = _this.parent().siblings('div').find('table').data('PATable');
+            table_obj.settings()[0].ajax.data = function (data) {
+                data.export = true;
+                data.listing_data = undefined;
             }
+            // var params = $("table[id^='dataTable']").DataTable().ajax.params();
+            // params.export = true;
+            // params.listing_data = undefined;
+            $.ajax({
+                url: '',
+                type: "POST",
+                data: table_obj.settings()[0],
+                success: function (data) {
+                    data = JSON.parse(data);
+                    var $a = $("<a>");
+                    $a.attr("href", data.file);
+                    $("body").append($a);
+                    $a.attr("download", data.fileName);
+                    $a[0].click();
+                    $a.remove()
+                }
+            });
         });
-    })
-    .delegate('button.print-btn', 'click', function () {
-        var _this = $(this);
-        var table_obj = _this.parent().siblings('div').find('table').data('PATable');
-        window.printMode = true;
-        table_obj.draw();
-        $("#navbar").hide();
-        $("#breadcrumbs").hide();
-        $("#sidebar").hide();
-        $(".main-content").css('margin-left', "0");
-        $(".page-header").hide();
-        $("#filterForm").hide();
-        $(".table-tools").hide();
-        $(".dataTable_processing").hide();
-        $(".dataTables_length").hide();
-        $(".dataTables_paginate").hide();
-        $(".dataTables_info").hide();
-        $("div.footer").hide();
-        $(".sidebar-menu").hide();
-        $(".page-title-area").hide();
-        $(".header-area").hide();
-        $(".page-container").css('padding', "0");
-        $(".action-buttons-div").hide();
-        $("form").hide();
-    })
-    .delegate('.export-btn', 'click', function () {
-        var _this = $(this);
-        var table_obj = _this.parent().siblings('div').find('table').data('PATable');
-        table_obj.settings()[0].ajax.data = function(data) {
-            data.export = true;
-            data.listing_data = undefined;
-        }
-        // var params = $("table[id^='dataTable']").DataTable().ajax.params();
-        // params.export = true;
-        // params.listing_data = undefined;
-        $.ajax({
-            url: '',
-            type: "POST",
-            data: table_obj.settings()[0],
-            success: function (data) {
-                data = JSON.parse(data);
-                var $a = $("<a>");
-                $a.attr("href", data.file);
-                $("body").append($a);
-                $a.attr("download", data.fileName);
-                $a[0].click();
-                $a.remove()
-            }
-        });
-    });
 });
 
 function renderInputs() {
     $(".selectpicker").selectpicker();
+
+    $("[data-toggle='tooltip']").tooltip();
+}
+
+function copyToClipboard(element) {
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val(element.data('copy')).select();
+    document.execCommand("copy");
+    $temp.remove();
 }
 
 $(document).ready(function () {
     renderInputs();
 
-    if($.cookie('flash_message')) {
+    $('.dummy_accordian').each(function () {
+        var _this = $(this);
+        var header = _this.data('title');
+        var theme = _this.data('theme');
+        if (theme == null) { theme = 'gradient_purple'; }
+        var show_icon = _this.data('show-icon');
+        var id = _this.data('id');
+        var acc_class = link_class = '';
+        if (theme == 'gradient_purple') {
+            acc_class = 'accordion-s3 gradiant-bg mt-3';
+        }
+        if (show_icon == false) {
+            link_class = 'icon-hide';
+        }
+
+        var html = '<div class="according ' + acc_class + '"><div class="card"><div class="card-header"><a class="card-link ' + link_class + '" data-toggle="collapse" href="#accordian_' + id + '" aria-expanded="true">' + header + '</a></div><div id="accordian_' + id + '" class="collapse show"><div class="card-body">';
+
+        html += _this.html();
+
+        html += '</div></div></div></div>';
+        _this.after(html);
+        _this.remove();
+        renderInputs();
+    });
+
+    if ($.cookie('flash_message')) {
         var flash_message = JSON.parse($.cookie('flash_message'));
         var message = flash_message[0];
         var mode = flash_message[1];
-        if(mode == 'success') {
+        if (mode == 'success') {
             successMessage(message);
-        } else if(mode == 'fail') {
+        } else if (mode == 'fail') {
             failMessage(message);
         }
         $.removeCookie('flash_message');
@@ -456,18 +502,18 @@ $(document).ready(function () {
         $(this).css("outline", 'none !important');
         $(this).css("decoration", 'none !important');
     });
-    
-    $(".reset-btn").click(function() {
+
+    $(".reset-btn").click(function () {
         window.location.href = window.location.href.split('?')[0];
     });
-    
+
     var main_container_padding = $(".page-container").css("padding");
     var main_content_padding = $(".main-content").css("margin-left");
     $(document).keyup(function (e) {
         if (e.which == 27) {
             $(".img_fullscreen").remove();
-            if(window.printMode == true) {
-                var tabledata = $('table').DataTable();                ;
+            if (window.printMode == true) {
+                var tabledata = $('table').DataTable();;
                 tabledata.draw();
                 $("#navbar").show();
                 $("#breadcrumbs").show();
@@ -492,9 +538,9 @@ $(document).ready(function () {
         }
     });
 
-    $(".form-ckeditor").each(function() {
+    $(".form-ckeditor").each(function () {
         ClassicEditor
-            .create(document.querySelector('#'+$(this).attr('id')))
+            .create(document.querySelector('#' + $(this).attr('id')))
             .then(editor => {
             })
             .catch(error => {
@@ -542,9 +588,9 @@ $(document).ready(function () {
     $(".formsubmit").click(function () {
         var ids = $(this).attr('id');
         if (ids == 'formSubmit') {
-            $("form").prepend("<input class='d-none' type='text' name='submit_btn' value='"+COMMON_SAVE+"'>");
+            $("form").prepend("<input class='d-none' type='text' name='submit_btn' value='" + COMMON_SAVE + "'>");
         } else if (ids == 'formSubmitBack') {
-            $("form").prepend("<input class='d-none' type='text' name='submit_btn' value='"+COMMON_SAVE_BACK+"'>");
+            $("form").prepend("<input class='d-none' type='text' name='submit_btn' value='" + COMMON_SAVE_BACK + "'>");
         }
         $("form").submit();
     });
@@ -555,11 +601,11 @@ $(document).ready(function () {
         $("tbody tr td > input[class*=table_checkbox]").prop('checked', $(this).prop('checked'));
     });
 
-    $(".upload_file").click(function() {
+    $(".upload_file").click(function () {
         $($(this).data('trigger')).click();
     });
 
-    $("input[type=file]").change(function() {
+    $("input[type=file]").change(function () {
         var _th = $(this);
         var file = _th[0].files[0];
         if (file) {
@@ -567,7 +613,7 @@ $(document).ready(function () {
             params.append('params', JSON.stringify(_th.data()));
             params.append('files', _th[0].files[0]);
             params.append('action', 'add');
-            if(_th.data('ajax') !== undefined) {
+            if (_th.data('ajax') !== undefined) {
                 $.ajax({
                     url: _th.data('ajax'),
                     data: params,
@@ -576,16 +622,16 @@ $(document).ready(function () {
                     processData: false,
                     contentType: false,
                     cache: false,
-                    success: function(response) {
+                    success: function (response) {
                         response = JSON.parse(response);
-                        if(response.status == 'fail') {
+                        if (response.status == 'fail') {
                             failMessage(COMMON_UPLOAD_ERROR);
                         } else {
-                            if($("#filepreview_"+_th.attr('id')).length == 0) {
-                                _th.parent('.upload_file_div').append("<span id='filepreview_"+_th.attr('id')+"' class='ml-2'></span>");
+                            if ($("#filepreview_" + _th.attr('id')).length == 0) {
+                                _th.parent('.upload_file_div').append("<span id='filepreview_" + _th.attr('id') + "' class='ml-2'></span>");
                             }
                             _th.siblings("input:hidden").val(response.filename);
-                            $("#filepreview_"+_th.attr('id')).html(response.preview_html);
+                            $("#filepreview_" + _th.attr('id')).html(response.preview_html);
                         }
                     }
                 });
@@ -593,7 +639,7 @@ $(document).ready(function () {
         }
     });
 
-    $(document).delegate('img.image_zoom', 'click', function() {
+    $(document).delegate('img.image_zoom', 'click', function () {
         var img_html = $(this).prop('outerHTML');
         img_html = $(img_html).removeAttr('width').removeClass('image_zoom').prop('outerHTML');
         var html = "<div class='img_fullscreen'>";
@@ -603,16 +649,16 @@ $(document).ready(function () {
         $('body').append(html);
     });
 
-    $(document).delegate('.img_fullscreen button.close', 'click', function() {
+    $(document).delegate('.img_fullscreen button.close', 'click', function () {
         $(".img_fullscreen").remove();
     });
 
-    $(".upload_file_div [id^='filepreview_'] i.delete").click(function() {
+    $(".upload_file_div [id^='filepreview_'] i.delete").click(function () {
         var _th = $(this).parent().siblings('input:file.form-hide');
         var params = new FormData();
         params.append('params', JSON.stringify(_th.data()));
         params.append('action', 'delete');
-        if(_th.data('ajax') !== undefined && confirm(COMMON_FILE_DELETE_WARNING)) {
+        if (_th.data('ajax') !== undefined && confirm(COMMON_FILE_DELETE_WARNING)) {
             $.ajax({
                 url: _th.data('ajax'),
                 data: params,
@@ -621,16 +667,16 @@ $(document).ready(function () {
                 processData: false,
                 contentType: false,
                 cache: false,
-                success: function(response) {
+                success: function (response) {
                     response = JSON.parse(response);
-                    if(response.status == 'fail') {
+                    if (response.status == 'fail') {
                         failMessage(COMMON_UPLOAD_ERROR);
                     } else {
-                        if($("#filepreview_"+_th.attr('id')).length == 0) {
-                            _th.parent('.upload_file_div').append("<span id='filepreview_"+_th.attr('id')+"' class='ml-2'></span>");
+                        if ($("#filepreview_" + _th.attr('id')).length == 0) {
+                            _th.parent('.upload_file_div').append("<span id='filepreview_" + _th.attr('id') + "' class='ml-2'></span>");
                         }
                         _th.siblings("input:hidden").val('');
-                        $("#filepreview_"+_th.attr('id')).html('<img src="'+DIR_HTTP_IMAGES_COMMON+'no_preview.jpg" width="100">');
+                        $("#filepreview_" + _th.attr('id')).html('<img src="' + DIR_HTTP_IMAGES_COMMON + 'no_preview.jpg" width="100">');
                     }
                 }
             });

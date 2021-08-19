@@ -46,7 +46,7 @@
                                             
                                             $extra_arr = array();
                                             if($inputType == 'text') {
-                                                $extra_arr['element_classes'] = 'w-50';
+                                                $extra_arr['element_class'] = 'w-50';
                                             }
                                             
                                             $options = array(

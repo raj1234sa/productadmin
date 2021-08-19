@@ -68,7 +68,7 @@ if($isAjaxRequest && ($listing_data || $export)) {
             if(!empty($http_path)) {
                 $rec['language_name'] .= draw_imge($http_path, $src_path, array('width'=>30, 'class'=>'ml-2'));
             }
-            $rec['status'] = form_switchbutton('status'.$lang['language_id'], $lang['status'], array('element_classes'=>'ajax change_status'));
+            $rec['status'] = form_switchbutton('status'.$lang['language_id'], $lang['status'], array('element_class'=>'ajax change_status'));
             // $rec[] = form_switchbutton('status', $state['status'], array('class'=>'ajax change_status'));
             // $action_buttons = array();
             // $action_buttons[COMMON_EDIT] = array(

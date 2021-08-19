@@ -26,7 +26,14 @@ $adminJsArr['passenger_action.php'] = array(
     DIR_HTTP_ADMIN_JS.'passengers.js',
 );
 
-$adminJsArrMain = array_merge($adminJsArr['global'], $adminJsArr[FILE_FILENAME_WITH_EXT]);
+$adminJsArr['email_configuration_action.php'] = array(
+    DIR_HTTP_ADMIN_JS.'email_configuration.js',
+);
+
+$adminJsArrMain = $adminJsArr['global'];
+if(isset($adminJsArr[FILE_FILENAME_WITH_EXT])) {
+    $adminJsArrMain = array_merge($adminJsArrMain, $adminJsArr[FILE_FILENAME_WITH_EXT]);
+}
 
 $globalJsVars = array();
 $globalJsVars['COMMON_SAVE_BACK'] = COMMON_SAVE_BACK;

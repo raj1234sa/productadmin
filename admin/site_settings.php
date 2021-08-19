@@ -1,7 +1,6 @@
 <?php
 
 require_once('../lib/common.php');
-
 $objSiteSettingsMaster = new SiteSettingsMaster();
 
 $submit = postValue('submit_btn');

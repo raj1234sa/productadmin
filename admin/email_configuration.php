@@ -68,7 +68,7 @@ if($isAjaxRequest && ($listing_data || $export)) {
             $rec['DT_RowId'] = "emailtempid:".$email_config['email_template_id'];
             $rec['sr'] = $sr++;
             $rec['template_constant'] = getEmailSubjectDetails($email_config);
-            $rec['status'] = form_switchbutton('status', $email_config['status'], array('element_classes'=>'ajax change_status', 'id'=>'status_'.$email_config['email_template_id']));
+            $rec['status'] = form_switchbutton('status', $email_config['status'], array('element_class'=>'ajax change_status', 'id'=>'status_'.$email_config['email_template_id']));
             $action_buttons = array();
             $action_buttons[COMMON_EDIT] = array(
                 'link' => DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_EDIT.'?action=edit&template_id='.$email_config['email_template_id'],

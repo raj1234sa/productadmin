@@ -1685,16 +1685,15 @@ table.dbkit-table tr td {
 
 /* accordion-3 */
 
-.accordion-s3 .card-header a.collapsed:before {
+.accordion-s3 .card-header a:not(.icon-hide).collapsed:before {
     content: "\e61a";
 }
 
-.accordion-s3 .card-header a:before {
+.accordion-s3 .card-header a:not(.icon-hide):before {
     content: "\e622";
     font-family: 'themify';
     position: absolute;
     right: 13px;
-    color: #444;
     font-size: 15px;
 }
 
@@ -1704,7 +1703,7 @@ table.dbkit-table tr td {
     color: #fff;
 }
 
-.gradiant-bg .card-header a:before {
+.gradiant-bg .card-header a:not(.icon-hide):before {
     color: #fff;
 }
 
@@ -1981,7 +1980,7 @@ label {
 }
 
 .custom-control-label {
-    margin-top: 2px;
+    /* margin-top: 2px; */
 }
 
 /*-------------------- END Form ------------------- */
