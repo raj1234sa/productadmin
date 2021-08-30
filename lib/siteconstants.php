@@ -2,6 +2,9 @@
 
 $siteSettingsMaster = new SiteSettingsMaster();
 
+if(IS_ADMIN) {
+    $siteSettingsMaster->setWhere("AND visible IN @visible", array(0, 1), 'string');
+}
 $siteSettingsData = $siteSettingsMaster->getSiteSetting();
 $siteSettingsData = objectToArray($siteSettingsData);
 foreach ($siteSettingsData as $setting) {

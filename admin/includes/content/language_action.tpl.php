@@ -1,8 +1,8 @@
-<?php echo draw_action_buttons($action_buttons) ?>
+<?php echo drawActionButtons($actionButtons) ?>
 <form id="filterForm">
     <?php
-    echo form_text('text', 'keyword', '', array('placeholder' => COMMON_SEARCH));
-    echo form_button('button', COMMON_SEARCH, 'btn-outline-primary ml-2', array('id' => 'search'));
+    echo formText('text', 'keyword', '', array('placeholder' => COMMON_SEARCH));
+    echo formButton('button', COMMON_SEARCH, 'btn-outline-primary ml-2', array('id' => 'search'));
     ?>
 </form>
 

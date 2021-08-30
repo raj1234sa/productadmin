@@ -34,3 +34,22 @@ function getEmailSubjectDetails($emailDetails, $format = 'html') {
 
     return $return;
 }
+
+function getMenuIconData($menuLink, $format = 'html') {
+    $separator = ($format == 'html') ? "<br>" : "\n";
+    $return = '';
+
+    $displayArr = array(
+        'b' => COMMON_BOTH,
+        't' => MENU_ONLY_TEXT,
+        'i' => MENU_ONLY_ICON,
+    );
+
+    $return = $displayArr[$menuLink['display']];
+
+    if($menuLink['icon_class'] && in_array($menuLink['display'], array('b', 'i'))) {
+        $return .= " ( <i class='".$menuLink['icon_class']."'></i> )";
+    }
+
+    return $return;
+}

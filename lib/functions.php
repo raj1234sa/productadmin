@@ -12,11 +12,11 @@ function objectToArray($data) {
     return $data;
 }
 
-function is_dev_mode() {
+function isDevMode() {
     return (defined('DEV_MODE') && constant('DEV_MODE') == true);
 }
 
-function type_cast($value, $type) {
+function typeCast($value, $type) {
     switch ($type) {
         case 'int':
         case 'integer':
@@ -39,7 +39,7 @@ function type_cast($value, $type) {
     }
 }
 
-function is_assoc(array $array) {
+function isAssoc(array $array) {
     return (bool) count(array_filter(array_keys($array), 'is_string'));
 }
 
@@ -54,7 +54,7 @@ function rxArrayToAssoc($rdxAry, $keyAry) {
     return $aryOut;
 }
 
-function is_blank($value, $type = null) {
+function isBlank($value, $type = null) {
     if(isset($type)) {
         switch ($type) {
             case 'string':
@@ -76,10 +76,11 @@ function is_blank($value, $type = null) {
     }
 }
 
-function set_flash_message($message, $mode) {
+function setFlashMessage($message, $mode) {
     setcookie('flash_message', json_encode(array($message, $mode)));
 }
-function getValue($name, $default='') {
+function getValue($name='', $default='') {
+    if(empty($name)) { return $_GET; }
     if(isset($_GET[$name])) {
         return $_GET[$name];
     } else {
@@ -87,7 +88,8 @@ function getValue($name, $default='') {
     }
 }
 
-function postValue($name, $default='') {
+function postValue($name='', $default='') {
+    if(empty($name)) { return $_POST; }
     if(isset($_POST[$name])) {
         return $_POST[$name];
     } else {
@@ -95,7 +97,8 @@ function postValue($name, $default='') {
     }
 }
 
-function requestValue($name, $default='') {
+function requestValue($name='', $default='') {
+    if(empty($name)) { return $_REQUEST; }
     if(isset($_REQUEST[$name])) {
         return $_REQUEST[$name];
     } else {
@@ -103,7 +106,8 @@ function requestValue($name, $default='') {
     }
 }
 
-function fileValue($name, $default='') {
+function fileValue($name='', $default='') {
+    if(empty($name)) { return $_FILES; }
     if(isset($_FILES[$name])) {
         return $_FILES[$name];
     } else {
@@ -147,7 +151,7 @@ function checkValidation($err) {
     return $validation;
 }
 
-function show_page_header($url) {
+function showPageHeader($url) {
     header("Location: ".$url);
     exit;
 }

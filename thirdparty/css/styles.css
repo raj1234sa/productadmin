@@ -1782,7 +1782,7 @@ table.dbkit-table tr td {
 /*-------------------- 10. Badge------------------- */
 
 .btn {
-    padding: 11px 17px;
+    padding: .45rem .6rem;
     font-size: 13px;
     letter-spacing: 0;
 }
@@ -1918,7 +1918,7 @@ p.card-text {
     font-size: 14px;
     border: 1px solid rgba(170, 170, 170, .3);
     padding: 10.72px 12.8px;
-    padding: .67rem .8rem;
+    padding: .45rem .6rem;
 }
 
 .form-control-sm,

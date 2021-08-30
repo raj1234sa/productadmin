@@ -5,15 +5,15 @@ require_once(DIR_WS_MODEL.'EmailConfigurationMaster.php');
 
 $objEmailConfigurationMaster = new EmailConfigurationMaster();
 
-$listing_data = postValue('listing_data');
+$listingData = postValue('listing_data');
 $export = requestValue('export');
 $action = requestValue('action');
 
 if($action == 'change_status') {
-    $status_code = postValue('status_code');
+    $statusCode = postValue('status_code');
     $status = postValue('status');
     $id = postValue('id');
-    if($status_code == 'status') {
+    if($statusCode == 'status') {
         $objEmailConfigurationData = new EmailConfigurationData();
         $objEmailConfigurationData->status = ($status == '1') ? '1' : '0';
         $objEmailConfigurationData->email_template_id = $id;
@@ -23,15 +23,15 @@ if($action == 'change_status') {
     exit;
 }
 
-if($isAjaxRequest && ($listing_data || $export)) {
-    extract(extract_search_fields(), EXTR_PREFIX_ALL, 'SC');
+if($isAjaxRequest && ($listingData || $export)) {
+    extract(extractSearchFields(), EXTR_PREFIX_ALL, 'SC');
 
     if($SC_column == 'template_constant') { $SC_column = 'constant_name'; }
     $objEmailConfigurationMaster->setLimit($SC_start, $SC_length);
     $objEmailConfigurationMaster->setOrderBy($SC_column.' '.$SC_dir);
 
     if($export) {
-        $objEmailConfigurationMaster->setSelect("IF(email_configuration.status = '1', 'Enabled', 'Disabled') as status");
+        $objEmailConfigurationMaster->setSelect("IF(email_configuration.status = '1', '".COMMON_ENABLED."', '".COMMON_DISABLED."') as status");
     }
 
     if($SC_keyword != '') {
@@ -45,16 +45,16 @@ if($isAjaxRequest && ($listing_data || $export)) {
 
     if($export) {
         $emailConfigDetails = objectToArray($emailConfigDetails);
-        $export_structure = array();
-        $export_structure[] = array('email_template_id'=>array('name'=>'email_template_id', 'title'=>COMMON_ID));
-        $export_structure[] = array('state_name'=>array('name'=>'state_name', 'title'=>COMMON_STATE_NAME));
-        $export_structure[] = array('country_name'=>array('name'=>'country_name', 'title'=>COMMON_COUNTRY_NAME));
-        $export_structure[] = array('status'=>array('name'=>'status', 'title'=>COMMON_STATUS));
+        $exportStructure = array();
+        $exportStructure[] = array('email_template_id'=>array('name'=>'email_template_id', 'title'=>COMMON_ID));
+        $exportStructure[] = array('state_name'=>array('name'=>'state_name', 'title'=>COMMON_STATE_NAME));
+        $exportStructure[] = array('country_name'=>array('name'=>'country_name', 'title'=>COMMON_COUNTRY_NAME));
+        $exportStructure[] = array('status'=>array('name'=>'status', 'title'=>COMMON_STATUS));
 
         $sheetTitle = "State Report";
         $headerDate = "All";
-        $spreadsheet = export_file_generate($export_structure, $emailConfigDetails);
-        echo json_encode(export_report($spreadsheet, 'export_state.xlsx'));
+        $spreadsheet = exportFileGenerate($exportStructure, $emailConfigDetails);
+        echo json_encode(exportReport($spreadsheet, 'export_state.xlsx'));
         exit;
     }
 
@@ -68,14 +68,14 @@ if($isAjaxRequest && ($listing_data || $export)) {
             $rec['DT_RowId'] = "emailtempid:".$email_config['email_template_id'];
             $rec['sr'] = $sr++;
             $rec['template_constant'] = getEmailSubjectDetails($email_config);
-            $rec['status'] = form_switchbutton('status', $email_config['status'], array('element_class'=>'ajax change_status', 'id'=>'status_'.$email_config['email_template_id']));
-            $action_buttons = array();
-            $action_buttons[COMMON_EDIT] = array(
+            $rec['status'] = formSwitchbutton('status', $email_config['status'], array('element_class'=>'ajax change_status', 'id'=>'status_'.$email_config['email_template_id']));
+            $actionButtons = array();
+            $actionButtons[COMMON_EDIT] = array(
                 'link' => DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_EDIT.'?action=edit&template_id='.$email_config['email_template_id'],
                 'icon' => 'fa fa-edit',
                 'class' => 'btn-outline-secondary',
             );
-            $rec['action'] = draw_action_menu($action_buttons);
+            $rec['action'] = drawActionMenu($actionButtons);
             $emailTemplates[] = $rec;
         }
     }

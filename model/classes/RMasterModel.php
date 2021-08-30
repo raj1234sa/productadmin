@@ -48,7 +48,7 @@ abstract class RMasterModel {
 		$this->queryType = self::SELECT;
 		self::$inputIdx = 0;
 		//$this->debug = (defined('DEV_MODE') && constant('DEV_MODE') === true); 
-		$this->debug = is_dev_mode(); 
+		$this->debug = isDevMode(); 
 			
 		// init connection
 		//$this->Connection->Connect(CONNECTION_TYPE,DATABASE_USERNAME,DATABASE_PASSWORD,DATABASE_NAME,DATABASE_HOST,DATABASE_PORT);
@@ -108,7 +108,7 @@ abstract class RMasterModel {
 			foreach ($this->params as $key => $param) {
 				$value = $this->params[$key];
 				if (!is_null($this->types[$key])) {
-					$value = type_cast($value, $this->types[$key]);
+					$value = typeCast($value, $this->types[$key]);
 				}
 				$key = "/$key\b/";
 				if (!is_null($value) && is_string($value)) {
@@ -224,7 +224,7 @@ abstract class RMasterModel {
 	
 	private function addParams($value, $type) {
 		$this->checkNull($value, $type);
-		if((is_array($value) && is_assoc($value)) && (is_array($type) && is_assoc($type))) {
+		if((is_array($value) && isAssoc($value)) && (is_array($type) && isAssoc($type))) {
 			foreach ($value as $k => $v) {
 				$this->checkNull($v, $type[$k]);
 				if(array_key_exists($k, $this->params) || array_key_exists($k, $this->types))
@@ -236,7 +236,7 @@ abstract class RMasterModel {
 				}
 				else {
 					$this->types[$k] = $type[$k];
-					$this->params[$k] = isset($type[$k]) ? type_cast($v, $type[$k]) : $v;
+					$this->params[$k] = isset($type[$k]) ? typeCast($v, $type[$k]) : $v;
 				}
 			}
 		}
@@ -248,7 +248,7 @@ abstract class RMasterModel {
 	public function setCustomParams($values, $types) {
 		$this->logDebugInfo(debug_backtrace());
 		$this->checkNull($values, $types);
-		if((is_array($values) && is_assoc($values)) && (is_array($types) && is_assoc($types))) {
+		if((is_array($values) && isAssoc($values)) && (is_array($types) && isAssoc($types))) {
 			$this->customParams = array_merge($this->customParams, $values);
 			$this->customTypes = array_merge($this->customTypes, $types);
 		}
@@ -269,7 +269,7 @@ abstract class RMasterModel {
 		
 	private function set($sql, $value, $type, $container, $check_blank = false, $throw_exception = false){
 		$this->checkNull($sql);
-		if(is_array($value) && !is_assoc($value) && is_array($type) && !is_assoc($type)){
+		if(is_array($value) && !isAssoc($value) && is_array($type) && !isAssoc($type)){
 			if(preg_match("/(:\w+|@\w+)/i", $sql, $matches)){
 				preg_match_all("/(:\w+|@\w+)/i", $sql, $matches);
 				$value = rxArrayToAssoc($value, $matches[0]);
@@ -282,12 +282,12 @@ abstract class RMasterModel {
 			preg_match_all("/:\w+/i", $sql, $matches);
 			$matches = $matches[0];
 			foreach ($matches as $match) {
-				if(is_array($value) && is_assoc($value)) {
-					if($check_blank && (is_null($value[$match]) || is_null($type[$match]) || is_blank(type_cast($value[$match], $type[$match]), $type[$match]))) return $this; 
+				if(is_array($value) && isAssoc($value)) {
+					if($check_blank && (is_null($value[$match]) || is_null($type[$match]) || isBlank(typeCast($value[$match], $type[$match]), $type[$match]))) return $this; 
 					$this->addParams(array($match => $value[$match]), array($match => $type[$match]));
 				}
 				else {
-					if($check_blank && (is_null($value) || is_null($type) || is_blank(type_cast($value, $type), $type))) return $this;
+					if($check_blank && (is_null($value) || is_null($type) || isBlank(typeCast($value, $type), $type))) return $this;
 					$this->addParams(array($match => $value), array($match => $type));
 				}
 			}
@@ -299,7 +299,7 @@ abstract class RMasterModel {
 			$matches = $matches[0];
 			$match_array = $replace_array = array();
 			foreach ($matches as $match) {
-				if(is_array($value) && is_assoc($value)) {
+				if(is_array($value) && isAssoc($value)) {
 					if(!$check_blank)
 						$this->checkNull($value[$match], $type[$match]);
 					$in_value = $value[$match]; unset($this->params[$match]);
@@ -310,11 +310,11 @@ abstract class RMasterModel {
 					$in_value = $value;
 					$in_type = $type;
 				}
-				if($check_blank && is_blank($in_value, 'array')) return $this;
+				if($check_blank && isBlank($in_value, 'array')) return $this;
 				$named_param = array();
 				foreach ($in_value as $v){
 					$named_param[] = ":input_" . RMasterModel::$inputIdx;
-					if($check_blank && (is_null($v) || is_null($type) || is_blank(type_cast($v, $type), $type))) return $this;
+					if($check_blank && (is_null($v) || is_null($type) || isBlank(typeCast($v, $type), $type))) return $this;
 					$this->addParams(array(":input_" . RMasterModel::$inputIdx => $v), array(":input_" . RMasterModel::$inputIdx => $type));
 					RMasterModel::$inputIdx++;
 				}
@@ -511,7 +511,7 @@ abstract class RMasterModel {
 			if(is_null($start)) {
 				$start = 0;
 			}
-			$this->addQuery(" LIMIT ".type_cast($total, "int")." OFFSET ". type_cast($start, "int"), 'limit');
+			$this->addQuery(" LIMIT ".typeCast($total, "int")." OFFSET ". typeCast($start, "int"), 'limit');
 		}
 		return $this;
 	}

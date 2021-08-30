@@ -5,15 +5,15 @@ require_once(DIR_WS_MODEL . 'PassengersMaster.php');
 
 $objPassengersMaster = new PassengersMaster();
 
-$listing_data = postValue('listing_data');
+$listingData = postValue('listing_data');
 $export = requestValue('export');
 $action = requestValue('action');
 
 if ($action == 'change_status') {
-    $status_code = postValue('status_code');
+    $statusCode = postValue('status_code');
     $status = postValue('status');
     $id = postValue('id');
-    if ($status_code == 'status') {
+    if ($statusCode == 'status') {
         $objPassengersData = new PassengersData();
         $objPassengersData->status = ($status == '1') ? '1' : '0';
         $objPassengersData->passenger_id = $id;
@@ -34,8 +34,24 @@ if ($action == 'delete') {
     exit;
 }
 
-if ($isAjaxRequest && ($listing_data || $export)) {
-    extract(extract_search_fields(), EXTR_PREFIX_ALL, 'SC');
+if($action == 'show_password') {
+    $pid = requestValue('pid');
+    $respArr = array();
+    if(!empty($pid)) {
+        $passengersDataPassword = $objPassengersMaster->getPassenger($pid);
+        if(!empty($passengersDataPassword)) {
+            $passengersDataPassword = $passengersDataPassword[0];
+            $respArr['email'] = $passengersDataPassword['email'];
+            $enc = new Encryption();
+            $respArr['password'] = $enc->decrypt($passengersDataPassword['password']);
+        }
+    }
+    echo json_encode($respArr);
+    exit;
+}
+
+if ($isAjaxRequest && ($listingData || $export)) {
+    extract(extractSearchFields(), EXTR_PREFIX_ALL, 'SC');
 
     $fieldArr = array(
         "passengers_master.*",
@@ -57,12 +73,21 @@ if ($isAjaxRequest && ($listing_data || $export)) {
     $objPassengersMaster->setOrderBy($SC_column . ' ' . $SC_dir);
 
     if ($export) {
-        $objPassengersMaster->setSelect("IF(passengers_master.status = '1', 'Enabled', 'Disabled') as status");
+        $objPassengersMaster->setSelect("IF(passengers_master.status = '1', '".COMMON_ENABLED."', '".COMMON_DISABLED."') as status");
     }
 
     if ($SC_keyword != '') {
         $objPassengersMaster->setWhere("AND (firstname LIKE :firstname", "%$SC_keyword%", 'string');
         $objPassengersMaster->setWhere("OR email LIKE :email", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR phone LIKE :phone", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR passengers_master.address_line LIKE :address_line", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR passengers_master.address_line2 LIKE :address_line2", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR passengers_master.area_name LIKE :area_name", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR stop_title LIKE :stop_title", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR stop_internal_name LIKE :stop_internal_name", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR city_name LIKE :city_name", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR country_name LIKE :country_name", "%$SC_keyword%", 'string');
+        $objPassengersMaster->setWhere("OR state_name LIKE :state_name", "%$SC_keyword%", 'string');
         $objPassengersMaster->setWhere("OR lastname LIKE :lastname)", "%$SC_keyword%", 'string');
     }
 
@@ -76,16 +101,16 @@ if ($isAjaxRequest && ($listing_data || $export)) {
 
     if ($export) {
         $passengersDetails = objectToArray($passengersDetails);
-        $export_structure = array();
-        $export_structure[] = array('passenger_id' => array('name' => 'passenger_id', 'title' => COMMON_ID));
-        $export_structure[] = array('state_name' => array('name' => 'state_name', 'title' => COMMON_STATE_NAME));
-        $export_structure[] = array('country_name' => array('name' => 'country_name', 'title' => COMMON_COUNTRY_NAME));
-        $export_structure[] = array('status' => array('name' => 'status', 'title' => COMMON_STATUS));
+        $exportStructure = array();
+        $exportStructure[] = array('passenger_id' => array('name' => 'passenger_id', 'title' => COMMON_ID));
+        $exportStructure[] = array('state_name' => array('name' => 'state_name', 'title' => COMMON_STATE_NAME));
+        $exportStructure[] = array('country_name' => array('name' => 'country_name', 'title' => COMMON_COUNTRY_NAME));
+        $exportStructure[] = array('status' => array('name' => 'status', 'title' => COMMON_STATUS));
 
         $sheetTitle = "State Report";
         $headerDate = "All";
-        $spreadsheet = export_file_generate($export_structure, $passengersDetails);
-        echo json_encode(export_report($spreadsheet, 'export_state.xlsx'));
+        $spreadsheet = exportFileGenerate($exportStructure, $passengersDetails);
+        echo json_encode(exportReport($spreadsheet, 'export_state.xlsx'));
         exit;
     }
 
@@ -100,24 +125,27 @@ if ($isAjaxRequest && ($listing_data || $export)) {
             $rec['sr'] = $sr++;
             $rec['user_info'] = getPassengerDetails($passenger);
             $rec['address_info'] = getAddressDetails($passenger);
-            $rec['status'] = form_switchbutton('status', $passenger['status'], array('element_class' => 'ajax change_status', 'id' => 'status_' . $passenger['passenger_id']));
-            $action_buttons = array();
-            $action_buttons[COMMON_EDIT] = array(
+            $rec['status'] = formSwitchbutton('status', $passenger['status'], array('element_class' => 'ajax change_status', 'id' => 'status_' . $passenger['passenger_id']));
+            $actionButtons = array();
+            $actionButtons[COMMON_EDIT] = array(
                 'link' => DIR_HTTP_ADMIN . FILE_ADMIN_PASSENGER_EDIT . '?action=edit&passenger_id=' . $passenger['passenger_id'],
                 'icon' => 'fa fa-edit',
                 'class' => 'btn-outline-secondary',
             );
-            $action_buttons[PASSENGER_SHOW_PASSWORD] = array(
-                'link' => DIR_HTTP_ADMIN . FILE_ADMIN_PASSENGER_EDIT . '?action=edit&passenger_id=' . $passenger['passenger_id'],
-                'icon' => 'ti-key',
-                'class' => 'btn-outline-secondary',
-            );
-            $action_buttons[COMMON_DELETE] = array(
+            if($SITE_VAR_PASSENGER_SHOW_PASSWORD) {
+                $actionButtons[PASSENGER_SHOW_PASSWORD] = array(
+                    'link' => 'javascript:void(0)',
+                    'icon' => 'ti-key',
+                    'class' => 'btn-outline-secondary show_password_btn',
+                    'extra' => "data-pass_id='{$passenger['passenger_id']}'",
+                );
+            }
+            $actionButtons[COMMON_DELETE] = array(
                 'link' => DIR_HTTP_ADMIN . FILE_ADMIN_PASSENGER_LISTING . '?action=delete&passenger_id=' . $passenger['passenger_id'],
                 'icon' => 'fa fa-trash',
                 'class' => 'bg-danger text-white ajax delete',
             );
-            $rec['action'] = draw_action_menu($action_buttons);
+            $rec['action'] = drawActionMenu($actionButtons);
             $passengers[] = $rec;
         }
     }
@@ -139,11 +167,16 @@ $breadcrumbArr = array(
     ),
 );
 
-$action_buttons = array();
-$action_buttons[ADD_PASSENGER] = array(
+$actionButtons = array();
+$actionButtons[ADD_PASSENGER] = array(
     'link' => DIR_HTTP_ADMIN . FILE_ADMIN_PASSENGER_EDIT,
     'class' => 'btn-success',
     'icon' => 'fa fa-plus'
+);
+$actionButtons[IMPORT_PASSENGER] = array(
+    'link' => DIR_HTTP_ADMIN . FILE_ADMIN_PASSENGER_IMPORT,
+    'class' => 'btn-secondary',
+    'icon' => 'fa fa-upload'
 );
 
 require_once(DIR_WS_ADMIN_INCLUDES . FILE_MAIN_INTERFACE);

@@ -14,11 +14,12 @@ $adminCssArr['global'] = array(
     DIR_HTTP_THIRDPARTY_CSS.'buttons.dataTables.min.css',
     DIR_HTTP_THIRDPARTY_CSS.'image-zoom.css',
     DIR_HTTP_THIRDPARTY_CSS.'bootstrap-select.min.css',
+    DIR_HTTP_THIRDPARTY_CSS.'smart_wizard_all.min.css',
     DIR_HTTP_THIRDPARTY_JS.'modernizr-2.8.3.min.js',
     DIR_HTTP_ADMIN_CSS.'admin.css',
 );
 
-function addCss($adminCssArr) {
+function addCss() {
     global $adminCssArr;
     foreach ($adminCssArr['global'] as $value) {
         if(pathinfo($value, PATHINFO_EXTENSION) == 'js') {

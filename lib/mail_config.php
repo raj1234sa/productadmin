@@ -7,6 +7,7 @@ function sendSampleEmail() {
 
     $variables = $notification->getVariables($emailKey);
     $variables['{site_name}'] = 'Raj';
+    $variables['{customer_name}'] = ' hey Raj';
 
     $emailConfig = $notification->getEmailConfiguration($emailKey, array_keys($variables), array_values($variables));
     

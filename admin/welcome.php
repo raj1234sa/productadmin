@@ -6,7 +6,7 @@ if($action == 'logout') {
     if(isset($_SESSION['admin_session'])) {
         unset($_SESSION['admin_session']);
     }
-    show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_LOGIN);
+    showPageHeader(DIR_HTTP_ADMIN.FILE_ADMIN_LOGIN);
 }
 
 $headingLabel = $pageTitle;

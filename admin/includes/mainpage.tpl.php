@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title><?php echo $pageTitle; ?> :: Admin</title>
+        <title><?= $pageTitle; ?> :: Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="shortcut icon" type="image/<?php echo SITE_FAVICON_EXT ?>" href="<?php echo SITE_FAVICON ?>">
+        <link rel="shortcut icon" type="image/<?= SITE_FAVICON_EXT ?>" href="<?= SITE_FAVICON ?>">
         <?php addCss($adminCssArr) ?>
     </head>
     <body>
@@ -44,15 +44,18 @@
                                 }
                                 ?>
                             </ul>
-                            <?php if(defined('DEV_MODE') && DEV_MODE) { ?>
+                            <?php if(isDevMode()) { ?>
                                 <div class="pt-1 pl-2">
-                                [Admin :: Section: <?php echo ADMIN_SECTION_ID ?> Menu: <?php echo ADMIN_MENU_ID ?> Page: <?php echo ADMIN_PAGE_ID ?>]
+                                [Admin :: Section: <?= ADMIN_SECTION_ID ?> Menu: <?= ADMIN_MENU_ID ?> Page: <?= ADMIN_PAGE_ID ?>]
                                 </div>
                             <?php } ?>
                         </div>
                         <!-- profile info & task notification -->
                         <div class="col-2 col-md-3 clearfix">
                             <ul class="notification-area pull-right">
+                                <li class="front-btn">
+                                    <i class="ti-desktop" onclick="window.open('<?= SITE_URL ?>','_blank')"></i>
+                                </li>
                                 <li id="full-view"><i class="ti-fullscreen"></i></li>
                                 <li id="full-view-exit"><i class="ti-zoom-out"></i></li>
                             </ul>
@@ -65,16 +68,16 @@
                     <div class="row align-items-center">
                         <div class="col-9 col-md-10">
                             <div class="heading-area">
-                                <h4 class="page-title pull-left"><?php echo $headingLabel; ?></h4>
+                                <h4 class="page-title pull-left"><?= $headingLabel; ?></h4>
                             </div>
                             <i class="fa fa-refresh fa-spin d-none ajax_loader"></i>
                         </div>
                         <div class="col-3 col-md-2 clearfix">
                             <div class="user-profile pull-right">
-                                <h4 class="user-name dropdown-toggle" data-toggle="dropdown"><?php echo SES_ADMIN_USERNAME ?><i class="fa fa-angle-down"></i></h4>
+                                <h4 class="user-name dropdown-toggle" data-toggle="dropdown"><?= SES_ADMIN_USERNAME ?><i class="fa fa-angle-down"></i></h4>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="#">Settings</a>
-                                    <a class="dropdown-item" href="<?php echo DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME.'?action=logout' ?>">Log Out</a>
+                                    <a class="dropdown-item" href="<?= DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME.'?action=logout' ?>">Log Out</a>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +99,7 @@
             <!-- footer area start-->
             <footer>
                 <div class="footer-area">
-                    <p>© Copyright 2018. All right reserved. Template by <a href="https://colorlib.com/wp/">Colorlib</a>.</p>
+                    <p>© <?= CONFIG_SITE_NAME ?> Copyright 2021. All right reserved.</p>
                 </div>
             </footer>
             <!-- footer area end-->

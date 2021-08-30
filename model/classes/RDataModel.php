@@ -81,7 +81,7 @@ abstract class RDataModel extends RDataRecord
 				
 				//TODO : Type Casting here
 			    $data_type = $this->_PropertyMap[$key]['3'];
-			    $params[":insert_$key"] = type_cast($Data[$key], $data_type);
+			    $params[":insert_$key"] = typeCast($Data[$key], $data_type);
 			}
 			$Query="(".$cols.") VALUES (".$vals.")";
 			/*echo $Query."<br/>";
@@ -100,7 +100,7 @@ abstract class RDataModel extends RDataRecord
 				
 				//TODO : Type Casting here
 			    $data_type = $this->_PropertyMap[$key]['3'];
-			    $params[":update_$key"] = type_cast($Data[$key], $data_type);
+			    $params[":update_$key"] = typeCast($Data[$key], $data_type);
 			}
 			/*echo $Query."<br/>";
 			echo "<pre>";print_r($params);echo "</pre>";

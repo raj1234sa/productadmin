@@ -59,6 +59,8 @@ if (IS_ADMIN) {
     $twc = array();
     createFrontConstants();
     require_once(DIR_WS_LIB . 'twig.php');
+    require_once(DIR_WS_TEMPLATES_CONTENT_INCLUDES . 'css.php');
+    require_once(DIR_WS_TEMPLATES_CONTENT_INCLUDES . 'js.php');
     // echo '<pre>'; print_r($twc); echo '</pre>'; exit;
     define('FILE_MAIN_INTERFACE', 'mainpage.tpl');
 }

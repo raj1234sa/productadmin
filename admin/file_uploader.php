@@ -11,13 +11,25 @@ $response = array();
 if($action == 'add') {
     $filename = fileValue('files');
 
-    $img_filename = generateFileName($filename['name']);
-    $filename['name'] = $img_filename;
-    $uploaded = uploadFiles(DIR_WS_TEMP_IMAGES, $filename);
+    $imgFilename = generateFileName($filename['name']);
+    $filename['name'] = $imgFilename;
+    $srcPath = $params['srcPath'];
+    $httpPath = $params['httpPath'];
+    $allowDelete = $params['delete'];
+    if(!is_dir($srcPath)) {
+        mkdir($srcPath);
+    }
+    $uploaded = uploadFiles($srcPath, $filename);
+    $extension = pathinfo($imgFilename, PATHINFO_EXTENSION);
+    $deleteStr = "<i class='ti-trash delete'></i>";
+    $fileType = '';
+    if(in_array($extension, array('jpg','png','jpeg','gif'))) { $fileType = 'image'; }
     if($uploaded) {
         $response = array(
-            'preview_html' => draw_imge(DIR_HTTP_TEMP_IMAGES.$img_filename, DIR_WS_TEMP_IMAGES.$img_filename, array('width'=>'100','class'=>'image_zoom')),
-            'filename' => $img_filename,
+            'preview_html' => drawImge($httpPath.$imgFilename, $srcPath.$imgFilename, array('width'=>'100','class'=>'image_zoom')).((!isset($allowDelete) || $allowDelete != false) ? $deleteStr : ''),
+            'file_preview_html' => $imgFilename.((!isset($allowDelete) || $allowDelete != false) ? $deleteStr : ''),
+            'filename' => $imgFilename,
+            'file_type' => $fileType,
         );
     } else {
         $response = array(
@@ -29,14 +41,18 @@ if($action == 'add') {
 }
 
 if($action == 'delete') {
-    $del_filename = $params['filename'];
-    $src_path = $params['srcPath'];
+    $delFilename = $params['filename'];
+    $srcPath = $params['srcPath'];
+    $extension = pathinfo($delFilename, PATHINFO_EXTENSION);
+    $fileType = '';
+    if(in_array($extension, array('jpg','png','jpeg','gif'))) { $fileType = 'image'; }
 
-    $result = unlink($src_path.$del_filename);
+    $result = unlink($srcPath.$delFilename);
     
     if($result) {
         $response = array(
-            'preview_html' => draw_noimge(array('width'=>'100')),
+            'preview_html' => drawNoimge(array('width'=>'100')),
+            'file_type' => $fileType,
         );
     } else {
         $response = array(

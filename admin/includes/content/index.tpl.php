@@ -17,15 +17,15 @@
                 <div class="login-box ptb--100">
                     <form method="POST" id="admin_login_frm">
                         <div class="login-form-head">
-                            <h4><?php echo COMMON_SIGNIN; ?></h4>
+                            <h4><?= CONFIG_SITE_NAME ?></h4>
                         </div>
                         <div class="login-form-body">
                             <?php
-                                $label_col_class = 0;
+                                $labelColClass = 0;
                                 $validation = array('required'=>COMMON_VALIDATE_REQUIRED);
-                                echo form_element('', 'text', 'admin_username', '', '', array('placeholder'=>COMMON_USERNAME, 'validation'=>$validation, 'error'=>$err['username']));
-                                echo form_element('', 'password', 'admin_password', '', '', array('placeholder'=>COMMON_PASSWORD, 'validation'=>$validation));
-                                echo form_hidden('backurl', getValue('backurl'));
+                                echo formElement('', 'text', 'admin_username', '', '', array('placeholder'=>COMMON_USERNAME, 'validation'=>$validation, 'error'=>$err['username']));
+                                echo formElement('', 'password', 'admin_password', '', '', array('placeholder'=>COMMON_PASSWORD, 'validation'=>$validation));
+                                echo formHidden('backurl', getValue('backurl'));
                             ?>
                             <div class="row mb-4 rmber-area justify-content-end">
                                 <div class="col-6 text-right">

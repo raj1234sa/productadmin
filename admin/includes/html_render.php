@@ -1,6 +1,11 @@
 <?php
-function draw_action_buttons($actionButtons) {
-    $availableActionLinks = get_available_actions();
+/**
+ * Draw action buttons
+ * @param array $actionButtons
+ * @return string
+*/
+function drawActionButtons($actionButtons) {
+    $availableActionLinks = getAvailableActions();
     $html = '<div class="text-right action-buttons-div">';
     foreach ($actionButtons as $key => $item) {
         if(!array_key_exists($key, $availableActionLinks)) { continue; }
@@ -14,13 +19,14 @@ function draw_action_buttons($actionButtons) {
 }
 
 /**
+ * Draw form buttons
  * @param string $submitButtons
- * @param array $extra
+ * @param string $backUrl
  * @return string
  */
-function draw_form_buttons($submitButtons, $extra = array()) {
+function drawFormButtons($submitButtons, $backUrl = null) {
     $submitButtons = explode(',', $submitButtons);
-    $html = '<div class="float-right">';
+    $html = '<div class="float-right form_button_div">';
     foreach ($submitButtons as $value) {
         switch ($value) {
             case 'save':
@@ -30,8 +36,8 @@ function draw_form_buttons($submitButtons, $extra = array()) {
                         </button>';
                 break;
             case 'back':
-                if (isset($extra['backUrl']) && !empty($extra['backUrl']))
-                    $html .= '<a class="btn btn-sm btn-secondary mr-1" href="' . $extra['backUrl'] . '">
+                if (isset($backUrl) && !empty($backUrl))
+                    $html .= '<a class="btn btn-sm btn-secondary mr-1" href="' . $backUrl . '">
                             <i class="pa-icon fa fa-arrow-left"></i>
                             Back
                         </a>';
@@ -52,8 +58,13 @@ function draw_form_buttons($submitButtons, $extra = array()) {
     return $html;
 }
 
-function draw_action_menu($actionLinks) {
-    $availableActionLinks = get_available_actions();
+/**
+ * Draw action menu button in listing
+ * @param array $actionLinks
+ * @return string
+ */
+function drawActionMenu($actionLinks) {
+    $availableActionLinks = getAvailableActions();
     $count = 0;
     $html = '<div class="table_action_buttons">';
     if(count($actionLinks) > 3) {
@@ -64,22 +75,28 @@ function draw_action_menu($actionLinks) {
                     <div class="dropdown-menu dropdown-menu-right action-menu">';
         foreach ($actionLinks as $key => $value) {
             if(!array_key_exists($key, $availableActionLinks)) { continue; }
-            $class = '';
+            $class = $extra = '';
             if (isset($value['class'])) {
                 $class = $value['class'];
             }
-            $html .= "<a href='{$value['link']}' class='dropdown-item $class'><i class='{$value['icon']} pa-icon'></i>$key</a>";
+            if(isset($value['extra'])) {
+                $extra = $value['extra'];
+            }
+            $html .= "<a href='{$value['link']}' class='dropdown-item $class' $extra><i class='{$value['icon']} pa-icon'></i>$key</a>";
             $count++;
         }
         $html .= '</div></div>';
     } else {
         foreach ($actionLinks as $key => $value) {
             if(!array_key_exists($key, $availableActionLinks)) { continue; }
-            $class = '';
+            $class = $extra = '';
             if (isset($value['class'])) {
                 $class = $value['class'];
             }
-            $html .= "<a href='{$value['link']}' data-toggle='tooltip' data-placement='top' title='".$key."' class='btn btn-sm $class'>
+            if(isset($value['extra'])) {
+                $extra = $value['extra'];
+            }
+            $html .= "<a href='{$value['link']}' data-toggle='tooltip' data-placement='top' title='".$key."' class='btn btn-sm $class' $extra>
             <i class='{$value['icon']}'></i></a>";
             $count++;
         }
@@ -91,8 +108,17 @@ function draw_action_menu($actionLinks) {
     return $html;
 }
 
-function form_element($label, $type='text', $name, $value = '', $class = '', $extra = array()) {
-    global $label_col_class;
+/**
+ * Draw different types of input fields
+ * @param string $label
+ * @param string $type (text, password, number, switchbutton, file, label, select, radio, ckeditor, textarea)
+ * @param string $name
+ * @param string $value
+ * @param string $class (mini, small, medium, large, none)
+ * @param array $extra
+ * @return string
+*/
+function formElement($label, $type='text', $name, $value = '', $class = '', $extra = array()) {
     $return = '';
     
     $id = $name;
@@ -110,9 +136,6 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
 
     $labelColClass = $colClasses['label'];
     $elementColClass = $colClasses['input'];
-    if($label_col_class != '') {
-        $labelColClass = $label_col_class;
-    }
 
     if($type == 'select') {
         $frmGrpClasses = str_replace('form-group', '', $frmGrpClasses);
@@ -124,7 +147,7 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
     } else {
         $elementColClass = 12;
     }
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
     $args = func_get_args();
     array_shift($args);
     $extraClasses = '';
@@ -142,21 +165,24 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
             if($type == 'switchbutton') {
                 $extraClasses .= ' form-switch';
             }
+            if($type == 'number') {
+                $elementColClass = 1;
+            }
             $return .= '<div class="col-12 col-md-'.$elementColClass.' '.$extraClasses.'">';
-            $return .= call_user_func_array('form_'.$type, $args);
+            $return .= call_user_func_array('form'.ucfirst($type), $args);
             $return .= '</div>';
             break;
         case 'ckeditor':
             array_shift($args);
             unset($args[2]);
             $return .= '<div class="col-12 col-md-'.$elementColClass.' '.$extraClasses.'">';
-            $return .= call_user_func_array('form_'.$type, $args);
+            $return .= call_user_func_array('form'.ucfirst($type), $args);
             $return .= '</div>';
             break;
         case 'textarea':
-            $extra_class = '';
+            $extraClass = '';
             if($extra['autosize'] == true) {
-                $extra_class .= "autosize-transition";
+                $extraClass .= "autosize-transition";
             }
             $rows = "rows='5'";
             if(!empty($extra['rows'])) {
@@ -167,7 +193,7 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
                 $cols = "cols='".$extra['cols']."'";
             }
             $return .= '<div class="col-sm-5">';
-            $return .= '<textarea id="'.$id.'" name="'.$name.'" class="form-control '.$extra_class.'" '.$rows.' '.$cols.' '.$attrStr.'>'.$value.'</textarea>';
+            $return .= '<textarea id="'.$id.'" name="'.$name.'" class="form-control '.$extraClass.'" '.$rows.' '.$cols.' '.$attrStr.'>'.$value.'</textarea>';
             $return .= '</div>';
             break;
         case 'datepicker':
@@ -185,7 +211,14 @@ function form_element($label, $type='text', $name, $value = '', $class = '', $ex
     return $return;
 }
 
-function form_ckeditor($name, $value = '', $extra = array()) {
+/**
+ * Draw ckeditor input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formCkeditor($name, $value = '', $extra = array()) {
     $return = '';
     
     $id = $name;
@@ -207,7 +240,7 @@ function form_ckeditor($name, $value = '', $extra = array()) {
     if(isset($extra['error']) && !empty($extra['error'])) {
         $extra['data-error'] = $extra['error'];
     }
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
     
     if(!empty($validation['required'])) {
         $return .= "<div class='validation-group $frmGrpClasses'>";
@@ -221,7 +254,14 @@ function form_ckeditor($name, $value = '', $extra = array()) {
     return $return;
 }
 
-function form_text($name, $value = '', $extra = array()) {
+/**
+ * Draw text input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formText($name, $value = '', $extra = array()) {
     $return = '';
     
     $id = str_replace(array('[',']'), '_', $name);
@@ -243,11 +283,11 @@ function form_text($name, $value = '', $extra = array()) {
     if(isset($extra['error']) && !empty($extra['error'])) {
         $extra['data-error'] = $extra['error'];
     }
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
 
-    // $extra_params = '';
+    // $extraParams = '';
     // if($type == 'number') {
-    //     $extra_params .= 'data-type="number" class="only-number"';
+    //     $extraParams .= 'data-type="number" class="only-number"';
     //     $type = 'text';
     // }
     if(!empty($validation['required'])) {
@@ -260,7 +300,55 @@ function form_text($name, $value = '', $extra = array()) {
     return $return;
 }
 
-function form_password($name, $value = '', $extra = array()) {
+/**
+ * Draw number input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formNumber($name, $value = '', $extra = array()) {
+    $return = '';
+    
+    $id = str_replace(array('[',']'), '_', $name);
+    if(!empty($extra['id'])) {
+        $id = $extra['id'];
+    }
+
+    $elementClasses = '';
+    $elementClasses = $extra['element_class'];
+    $frmGrpClasses = $extra['form_group_class'];
+    $validation = $extra['validation'];
+    if(!empty($validation)) {
+        if($validation) {
+            foreach ($validation as $key => $value1) {
+                $extra['data-validation-'.$key] = $value1;
+            }
+        }
+    }
+    if(isset($extra['error']) && !empty($extra['error'])) {
+        $extra['data-error'] = $extra['error'];
+    }
+    $attrStr = getAttributes($extra);
+
+    if(!empty($validation['required'])) {
+        $return .= "<div class='validation-group $frmGrpClasses'>";
+    }
+    $return .= "<input type='number' id='".$id."' name='".$name."' class='form-control ".$elementClasses."' value='".$value."' ".$attrStr." />";
+    if(!empty($validation['required'])) {
+        $return .= "</div>";
+    }
+    return $return;
+}
+
+/**
+ * Draw password input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formPassword($name, $value = '', $extra = array()) {
     $return = '';
     
     $id = $name;
@@ -279,7 +367,7 @@ function form_password($name, $value = '', $extra = array()) {
             }
         }
     }
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
 
     if(!empty($validation['required'])) {
         $return .= "<div class='validation-group $frmGrpClasses'>";
@@ -291,14 +379,21 @@ function form_password($name, $value = '', $extra = array()) {
     return $return;
 }
 
-function form_file($name, $value = '', $extra = array()) {
+/**
+ * Draw file input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formFile($name, $value = '', $extra = array()) {
     $return = '';
     
     $id = $name;
     if(!empty($extra['id'])) {
         $id = $extra['id'];
     }
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
 
     $return .= '<div class="upload_file_div">';
     $return .= '<input type="file" class="form-hide" id="'.$id.'" '.$attrStr.' data-filename="'.$value.'">';
@@ -307,22 +402,21 @@ function form_file($name, $value = '', $extra = array()) {
                     <i class="fa fa-upload pa-icon"></i>
                     '.COMMON_UPLOAD_FILE.'
                 </button></div>';
-    if(!empty($value) && file_exists($extra['data-src-path'].$value) && is_file($extra['data-src-path'].$value)) {
-        $return .= '<span id="filepreview_'.$id.'" class="ml-2">';
-        if($extra['allow_delete'] != false || !isset($extra['allow_delete']))
-            $return .= '<i class="ti-trash delete"></i>';
-        $return .= '<img src="'.$extra['data-http-path'].$value.'" width="100" class="image_zoom">
-                    </span>';
-    } else {
-        $return .= '<span id="filepreview_'.$id.'" class="ml-2">
-                        <img src="'.DIR_HTTP_IMAGES_COMMON.'no_preview.jpg" width="100">
-                    </span>';
+    if(isset($extra['html']) && $extra['html']) {
+        $return .= $extra['html'];
     }
     $return .= '</div>';
     return $return;
 }
 
-function form_switchbutton($name, $value = '', $extra = array()) {
+/**
+ * Draw switchbutton input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formSwitchbutton($name, $value = '', $extra = array()) {
     $return = '';
     
     $id = $name;
@@ -330,20 +424,27 @@ function form_switchbutton($name, $value = '', $extra = array()) {
         $id = $extra['id'];
     }
     $elementClasses = $extra['element_class'];
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
 
-    $extra_params = '';
+    $extraParams = '';
     if($value) {
-        $extra_params .= ' checked';
+        $extraParams .= ' checked';
     }
     $return .= '<div class="switch">
-                    <input id="'.$id.'" class="cmn-toggle cmn-toggle-round '.$elementClasses.'" '.$extra_params.' type="checkbox" name="'.$name.'" value="1" '.$attrStr.'>
+                    <input id="'.$id.'" class="cmn-toggle cmn-toggle-round '.$elementClasses.'" '.$extraParams.' type="checkbox" name="'.$name.'" value="1" '.$attrStr.'>
                     <label for="'.$id.'"></label>
                 </div>';
     return $return;
 }
 
-function form_label($name, $value = '', $extra = array()) {
+/**
+ * Draw label input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formLabel($name, $value = '', $extra = array()) {
     $return = '';
 
     $id = $name;
@@ -352,13 +453,20 @@ function form_label($name, $value = '', $extra = array()) {
     }
 
     $elementClasses = $extra['element_class'];
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
 
     $return .= '<label for="'.$id.'" class="m-0 '.$elementClasses.'" '.$attrStr.'>'.$value.'</label>';
     return $return;
 }
 
-function form_select($name, $value = '', $extra = array()) {
+/**
+ * Draw select input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formSelect($name, $value = '', $extra = array()) {
     $return = '';
 
     $id = $name;
@@ -366,16 +474,37 @@ function form_select($name, $value = '', $extra = array()) {
         $id = $extra['id'];
     }
     $list = $extra['list'];
-    $attrStr = get_attributes($extra);
     $elementClasses = $extra['element_class'];
-
-    $return .= '<select class="selectpicker '.$elementClasses.'" '.$extra['attributes'].' id="'.$id.'" name="'.$name.'" '.$attrStr.'">';
-    $return .= draw_options($list, $extra['value_field'], $extra['text_field'], $value, $extra['list_before']);
+    $frmGrpClasses = $extra['form_group_class'];
+    $validation = $extra['validation'];
+    if(!empty($validation)) {
+        if($validation) {
+            foreach ($validation as $key => $value1) {
+                $extra['data-validation-'.$key] = $value1;
+            }
+        }
+    }
+    $attrStr = getAttributes($extra);
+    if(!empty($validation['required'])) {
+        $return .= "<div class='validation-group $frmGrpClasses'>";
+    }
+    $return .= '<select class="'.$elementClasses.'" '.$extra['attributes'].' id="'.$id.'" name="'.$name.'" '.$attrStr.'">';
+    $return .= drawOptions($list, $extra['value_field'], $extra['text_field'], $value, $extra['list_before'], $extra);
     $return .= '<select>';
+    if(!empty($validation['required'])) {
+        $return .= "</div>";
+    }
     return $return;
 }
 
-function form_radio($name, $value = '', $extra = array()) {
+/**
+ * Draw radio input
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formRadio($name, $value = '', $extra = array()) {
     $return = '';
 
     $id = $name;
@@ -383,46 +512,63 @@ function form_radio($name, $value = '', $extra = array()) {
         $id = $extra['id'];
     }
     $list = $extra['list'];
-    $attrStr = get_attributes($extra);
+    $attrStr = getAttributes($extra);
     $elementClasses = $extra['element_class'];
 
+    $count = 0;
     foreach ($list as $key => $field) {
-        $value_field = !isset($extra['value_field']) ? $key : $field[$extra['value_field']];
-        $text_field = !isset($extra['text_field']) ? $field : $field[$extra['text_field']];
-        $select = ($value == $value_field) ? "checked" : '';
+        $valueField = !isset($extra['value_field']) ? $key : $field[$extra['value_field']];
+        $textField = !isset($extra['text_field']) ? $field : $field[$extra['text_field']];
+        if($value == '' && $count == 0) {
+            $value = $valueField;
+        }
+        $select = ($value == $valueField) ? "checked" : '';
         $return .= '<div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" value="'.$value_field.'" id="'.$name.'_'.$key.'" name="'.$name.'" class="custom-control-input" '.$select.'>
-                        <label class="custom-control-label" for="'.$name.'_'.$key.'">'.$text_field.'</label>
+                        <input type="radio" value="'.$valueField.'" id="'.$name.'_'.$key.'" name="'.$name.'" class="custom-control-input" '.$select.'>
+                        <label class="custom-control-label" for="'.$name.'_'.$key.'">'.$textField.'</label>
                     </div>';
+        $count++;
     }
     return $return;
 }
 
-function draw_options($list, $value_field, $text_field, $selected, $before = null) {
+/**
+ * Draw options for select input
+ * @param array $list
+ * @param string $valueField
+ * @param string $textField
+ * @param string $selected
+ * @param string $before
+ * @return string
+*/
+function drawOptions($list, $valueField, $textField, $selected, $before = null, $extra = array()) {
     $html = '';
     if(isset($before) || !empty($before)) {
         $html .= $before;
     }
-    foreach ($list as $value) {
-        $select = ($selected == $value[$value_field]) ? "selected='selected'" : '';
-        $html .= "<option value='" . $value[$value_field] . "' $select>" . $value[$text_field] . "</option>";
+    foreach ($list as $key=>$value) {
+        $valueField = !isset($extra['value_field']) ? $key : $value[$extra['value_field']];
+        $textField = !isset($extra['text_field']) ? $value : $value[$extra['text_field']];
+        $select = ($selected == $valueField) ? "selected='selected'" : '';
+        $attr = $extra['selectpicker-content'] ? "data-content='".$textField."'" : '';
+        $icon = $extra['selectpicker-icon'] ? "data-icon='".$textField['icon']."'" : '';
+        $text = $textField;
+        if($extra['selectpicker-icon']) {
+            $text = $textField['text'];
+        }
+        $html .= "<option $icon $attr value='" . $valueField . "' $select>" . $text . "</option>";
     }
     return $html;
 }
 
-function drawRadio($list, $value_field, $text_field, $selected) {
-    $html = '';
-    foreach ($list as $value) {
-        $select = ($selected == $value[$value_field]) ? "checked" : '';
-        $html .= '<div class="custom-control custom-radio">
-                    <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" '.$select.'>
-                    <label class="custom-control-label" for="customRadio1">'.$text_field.'</label>
-                </div>';
-    }
-    return $html;
-}
-
-function form_hidden($name, $value = '', $extra_param = array()) {
+/**
+ * Draw hidden input field
+ * @param string $name
+ * @param string $value
+ * @param array $extra
+ * @return string
+*/
+function formHidden($name, $value = '', $extra_param = array()) {
     $type = 'hidden';
     $id = !empty($id) ? $extra_param['id'] : $name;
     if($name) {
@@ -430,13 +576,26 @@ function form_hidden($name, $value = '', $extra_param = array()) {
     }
 }
 
-function form_button($type, $title, $classes, $extra_params = array()) {
-    $attrStr = get_attributes($extra_params);
+/**
+ * Draw buttons
+ * @param string $type
+ * @param string $title
+ * @param string $classes
+ * @param array $extra
+ * @return string
+*/
+function formButton($type, $title, $classes, $extraParams = array()) {
+    $attrStr = getAttributes($extraParams);
     $return = '<button type="'.$type.'" class="btn '.$classes.'" '.$attrStr.'>'.$title.'</button>';
     return $return;
 }
 
-function get_attributes($extra) {
+/**
+ * Get form element attributes string
+ * @param array $extra
+ * @return string
+*/
+function getAttributes($extra) {
     unset($extra['list']);
     unset($extra['list_before']);
     unset($extra['value_field']);
@@ -446,6 +605,12 @@ function get_attributes($extra) {
     unset($extra['error']);
     unset($extra['selected']);
     unset($extra['form_group_class']);
+    unset($extra['html']);
+    unset($extra['preview']);
+    if($extra['searchdropdown']) {
+        $extra['data-live-search'] = 'true';
+    }
+    unset($extra['searchdropdown']);
     $return = '';
     foreach ($extra as $key => $value) {
         $return .= " $key='$value' ";
@@ -453,12 +618,17 @@ function get_attributes($extra) {
     return $return;
 }
 
-function getExtraClasses($classname) {
+/**
+ * Get label and element col classes
+ * @param string $className
+ * @return array
+*/
+function getExtraClasses($className) {
     global $labelColClass;
     if($labelColClass == '') {
-        $labelColClass = 3;
+        $labelColClass = 2;
     }
-    switch ($classname) {
+    switch ($className) {
         case 'mini':
             return array('label'=>$labelColClass, 'input'=>1);
             break;

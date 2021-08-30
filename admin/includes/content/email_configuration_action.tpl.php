@@ -1,7 +1,7 @@
 <form method="POST" id="form_add_passenger">
     <div class="row">
         <div class="col-12">
-            <?php echo draw_form_buttons('save,save_back,back', array('backUrl'=>DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_LISTING)) ?>
+            <?php echo drawFormButtons('save,save_back,back', DIR_HTTP_ADMIN.FILE_ADMIN_EMAIL_CONFIG_LISTING) ?>
         </div>
     </div>
     <?php
@@ -11,15 +11,15 @@
     ?>
     <div class="formrows mt-3">
         <?php
-            $label_col_class = 2;
+            $labelColClass = 2;
 
-            echo form_element(EMAIL_TEMPLATE_KEY, 'label', '', $email_config_data['constant_name']);
+            echo formElement(EMAIL_TEMPLATE_KEY, 'label', '', $emailConfigData['constant_name']);
 
-            echo form_element(EMAIL_TEMPLATE_SUBJECT, 'text', 'template_subject', $email_config_data['template_subject'], 'medium', array('validation'=>$validation, 'error'=>$err['template_subject']));
+            echo formElement(EMAIL_TEMPLATE_SUBJECT, 'text', 'template_subject', $emailConfigData['template_subject'], 'medium', array('validation'=>$validation, 'error'=>$err['template_subject']));
 
-            echo form_element(EMAIL_TEMPLATE_CONTENT, 'ckeditor', 'template_content', $email_config_data['template_content'], 'none', array('error'=>$err['template_content']));
+            echo formElement(EMAIL_TEMPLATE_CONTENT, 'ckeditor', 'template_content', $emailConfigData['template_content'], 'none', array('error'=>$err['template_content']));
 
-            echo form_element(COMMON_STATUS, 'switchbutton', 'status', $email_config_data['status'], '');
+            echo formElement(COMMON_STATUS, 'switchbutton', 'status', $emailConfigData['status'], '');
         ?>
     </div>
 </form>

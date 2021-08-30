@@ -37,15 +37,15 @@ foreach ($adminSectionData as $key => $value) {
 }
 
 if(defined('SITE_LOGO') && SITE_LOGO == '') {
-    $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WEBSITE_LOGOS."' class='btn btn-primary'>Upload Logo Here</a>";
+    $logoText = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WEBSITE_LOGOS."' class='btn btn-primary'>Upload Logo Here</a>";
 } else {
-    $logo_text = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME."' title='".CONFIG_SITE_NAME."'><img src='".SITE_LOGO."' alt='logo'></a>";
+    $logoText = "<a href='".DIR_HTTP_ADMIN.FILE_ADMIN_WELCOME."' title='".CONFIG_SITE_NAME."'><img src='".SITE_LOGO."' alt='logo'></a>";
 }
 ?>
 <div class="sidebar-menu">
     <div class="sidebar-header">
         <div class="logo">
-            <?php echo $logo_text; ?>
+            <?php echo $logoText; ?>
         </div>
     </div>
     <div class="main-menu">
@@ -55,39 +55,39 @@ if(defined('SITE_LOGO') && SITE_LOGO == '') {
                     <?php
                     foreach ($finalLeftMenuData as $section) {
                         $menuData = (isset($section['children'])) ? $section['children'] : array();
-                        $section_title = $section['section_title'];
-                        $section_icon = $section['section_icon'];
-                        $section_url = empty($section['section_url']) ? 'javascript:void(0)' : $section['section_url'];
-                        $section_active = (ADMIN_SECTION_ID == $section['section_id']);
+                        $sectionTitle = $section['section_title'];
+                        $sectionIcon = $section['section_icon'];
+                        $sectionUrl = empty($section['section_url']) ? 'javascript:void(0)' : $section['section_url'];
+                        $sectionActive = (ADMIN_SECTION_ID == $section['section_id']);
 
-                        $section_active_class = ($section_active) ? 'active' : '';
-                        $section_class = $section_active ? 'aria-expanded="true"' : 'aria-expanded="false"';
-                        $menu_expand = $section_active ? 'in' : '';
+                        $sectionActiveClass = ($sectionActive) ? 'active' : '';
+                        $sectionClass = $sectionActive ? 'aria-expanded="true"' : 'aria-expanded="false"';
+                        $menuExpand = $sectionActive ? 'in' : '';
 
-                        if(!empty($section_icon)) {
-                            $icon_text = '<i class="'.$section_icon.'"></i>';
+                        if(!empty($sectionIcon)) {
+                            $iconText = '<i class="'.$sectionIcon.'"></i>';
                         }
-                        if(!empty($section_title)) {
-                            $title_text = '<span>'.$section_title.'</span>';
+                        if(!empty($sectionTitle)) {
+                            $titleText = '<span>'.$sectionTitle.'</span>';
                         }
                         ?>
-                        <li class="<?php echo $section_active_class ?>">
-                            <a href="<?php echo $section_url; ?>" <?php echo $section_class; ?>>
-                                <?php echo $icon_text; echo $title_text; ?>
+                        <li class="<?php echo $sectionActiveClass ?>">
+                            <a href="<?php echo $sectionUrl; ?>" <?php echo $sectionClass; ?>>
+                                <?php echo $iconText; echo $titleText; ?>
                             </a>
                             <?php
                             if(!empty($menuData)) {
-                                echo '<ul class="collapse '.$menu_expand.'">';
+                                echo '<ul class="collapse '.$menuExpand.'">';
                                 foreach ($menuData as $menu) {
                                     $menuUrl = $menu['action_page'];
                                     $menuTitle = $menu['menu_title'];
-                                    $menu_active_class = ($section_active && in_array($menu['page_id'], ADMIN_ALLOWED_PAGE_ID)) ? 'active' : '';
+                                    $menuActiveClass = ($sectionActive && in_array($menu['page_id'], ADMIN_ALLOWED_PAGE_ID)) ? 'active' : '';
 
                                     if(!empty($menuUrl)) {
                                         $menuUrl = DIR_HTTP_ADMIN.$menuUrl;
                                     }
                                     ?>
-                                    <li class='<?php echo $menu_active_class ?>'><a href="<?php echo $menuUrl; ?>"><?php echo $menuTitle; ?></a></li>
+                                    <li class='<?php echo $menuActiveClass ?>'><a href="<?php echo $menuUrl; ?>"><?php echo $menuTitle; ?></a></li>
                                     <?php
                                 }
                                 echo '</ul>';

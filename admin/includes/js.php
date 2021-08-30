@@ -17,17 +17,30 @@ $adminJsArr['global'] = array(
     DIR_HTTP_THIRDPARTY_JS.'bootbox.min.js',
     DIR_HTTP_THIRDPARTY_JS.'ckeditor.js',
     DIR_HTTP_THIRDPARTY_JS.'bootstrap-select.min.js',
+    DIR_HTTP_THIRDPARTY_JS.'jquery.smartWizard.min.js',
     DIR_HTTP_THIRDPARTY_JS.'scripts.js',
     DIR_HTTP_ADMIN_JS.'admin.js',
     DIR_HTTP_ADMIN_JS.'validation.js',
 );
 
 $adminJsArr['passenger_action.php'] = array(
-    DIR_HTTP_ADMIN_JS.'passengers.js',
+    DIR_HTTP_ADMIN_JS.'passenger_action.js',
+);
+
+$adminJsArr['passenger_listing.php'] = array(
+    DIR_HTTP_ADMIN_JS.'passenger_listing.js',
 );
 
 $adminJsArr['email_configuration_action.php'] = array(
     DIR_HTTP_ADMIN_JS.'email_configuration.js',
+);
+
+$adminJsArr['menu_link_action.php'] = array(
+    DIR_HTTP_ADMIN_JS.'menu_link_action.js',
+);
+
+$adminJsArr['passenger_import.php'] = array(
+    DIR_HTTP_ADMIN_JS.'passenger_import.js',
 );
 
 $adminJsArrMain = $adminJsArr['global'];
@@ -52,6 +65,12 @@ $globalJsVars['SC_NO_RECORDS_TABLE'] = SC_NO_RECORDS_TABLE;
 $globalJsVars['SC_NO_RECORDS_FOUND'] = SC_NO_RECORDS_FOUND;
 $globalJsVars['DIR_WS_IMAGES'] = DIR_WS_IMAGES;
 $globalJsVars['DIR_HTTP_IMAGES'] = DIR_HTTP_IMAGES;
+$globalJsVars['SITE_URL'] = SITE_URL;
+$globalJsVars['FILE_FILENAME_WITHOUT_EXT'] = FILE_FILENAME_WITHOUT_EXT;
+$globalJsVars['FILE_FILENAME_WITH_EXT'] = FILE_FILENAME_WITH_EXT;
+$globalJsVars['COMMON_IMPORT'] = COMMON_IMPORT;
+$globalJsVars['COMMON_NEXT'] = COMMON_NEXT;
+$globalJsVars['COMMON_PREVIOUS'] = COMMON_PREVIOUS;
 
 if(!$isAjaxRequest) {
     echo "<script>";

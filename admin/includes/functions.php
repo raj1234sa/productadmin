@@ -3,6 +3,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+/**
+ * Create admin section, page, menu od constants
+*/
 function defineAccessData() {
     require_once(DIR_WS_MODEL.'AdminMenuMaster.php');
     require_once(DIR_WS_MODEL.'AdminSectionMaster.php');
@@ -45,6 +48,9 @@ function defineAccessData() {
     define('ADMIN_ALLOWED_PAGE_ID', $allowedPages);
 }
 
+/**
+ * Create admin constants
+*/
 function createAdminConstants() {
     if(defined('ADMIN_MENU_ID')) {
         require_once(DIR_WS_MODEL.'AdminConstantsMaster.php');
@@ -63,23 +69,41 @@ function createAdminConstants() {
     }
 }
 
-function extract_search_fields() {
-    $searchData = requestValue('data');
+/**
+ * Get datatable filter data
+ * @return array
+*/
+function extractSearchFields() {
+    $postData = requestValue();
+    $searchData = $postData['data'];
     parse_str($searchData, $resultSearch);
-    $resultSearch['start'] = requestValue('start');
-    $resultSearch['length'] = requestValue('length');
+    $resultSearch['start'] = $postData['start'];
+    $resultSearch['length'] = $postData['length'];
     $resultSearch['column'] = $resultSearch['dir'] = '';
-    if(isset($_REQUEST['order'])) {
-        $resultSearch['column'] = requestValue('columns')[requestValue('order')[0]['column']]['data'];
-        $resultSearch['dir'] = requestValue('order')[0]['dir'];
+    if(isset($postData['order'])) {
+        $resultSearch['column'] = $postData['columns'][$postData['order'][0]['column']]['data'];
+        $resultSearch['dir'] = $postData['order'][0]['dir'];
     }
-    parse_str(requestValue('searchval'), $urlParams);
+    $resultSearch['searchval'] = $postData['search']['value'];
+    parse_str($postData['searchval'], $urlParams);
     $resultSearch = array_merge($resultSearch, $urlParams);
     return $resultSearch;
 }
 
-function export_report($spreadsheet, $fileName = 'download.xlsx') {
+/**
+ * Get response for download
+ * @param Spreadsheet $spreadsheet
+ * @param string $fileName
+ * @return array
+*/
+function exportReport($spreadsheet, $fileName = '') {
     ob_start();
+    if(empty($fileName)) {
+        global $pageTitle;
+        $fileName = str_replace(" ", "_", $pageTitle);
+        $fileName = preg_replace('/[^A-Za-z0-9\-]/', '_', $fileName);
+    }
+    $fileName = empty($fileName) ? 'download.xlsx' : $fileName;
     IOFactory::createWriter($spreadsheet, 'Xlsx')->save('php://output');
     $pdfData = ob_get_contents();
     ob_end_clean();
@@ -90,13 +114,21 @@ function export_report($spreadsheet, $fileName = 'download.xlsx') {
     );
 }
 
-function export_file_generate($exportDataStructure, $exportData, $extra = array()) {
+/**
+ * Get spreadsheet data based in data passed
+ * @param array $exportDataStructure
+ * @param array $exportData
+ * @param array $extra
+ * @return Spreadsheet
+*/
+function exportFileGenerate($exportDataStructure, $exportData, $extra = array()) {
     if (!empty($exportData)) {
         $rowIndex = 0;
         $colIndex = 0;
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         global $sheetTitle;
+        $sheetTitle = preg_replace('/[^A-Za-z0-9\-]/', '_', $sheetTitle);
         $sheet->setTitle((!empty($extra['sheetTitle']) ? $extra['sheetTitle'] : $sheetTitle));
 
         $styleArray = [
@@ -170,15 +202,15 @@ function export_file_generate($exportDataStructure, $exportData, $extra = array(
                 $cellHeight = 15;
                 $value1 = array_values($value1)[0];
                 if(isset($value1['call_func']) && !empty($value1['call_func'])) {
-                    $func_param = array();
+                    $funcParam = array();
                     foreach ($value1['func_param'] as $param) {
                         if(in_array($param, array_keys($value))) {
-                            $func_param[] = $value[$param];
+                            $funcParam[] = $value[$param];
                         } else {
-                            $func_param[] = $param;
+                            $funcParam[] = $param;
                         }
                     }
-                    $value[$value1['name']] = call_user_func_array($value1['call_func'], $func_param);
+                    $value[$value1['name']] = call_user_func_array($value1['call_func'], $funcParam);
                 }
                 if (is_array($value[$value1['name']])) {
                     $cellHeight = count($value[$value1['name']]) * 15;
@@ -232,18 +264,30 @@ function export_file_generate($exportDataStructure, $exportData, $extra = array(
     }
 }
 
-function draw_imge($imgHttpPath, $imgSrcPath, $extraParam = array()) {
+/**
+ * Draw image
+ * @param string $imgHttpPath
+ * @param string $imgSrcPath
+ * @param array $extraParam
+ * @return string
+*/
+function drawImge($imgHttpPath, $imgSrcPath, $extraParam = array()) {
     $html = '';
-    $attr = get_attributes($extraParam);
+    $attr = getAttributes($extraParam);
     
     if(file_exists($imgSrcPath))
         $html = '<img src="'.$imgHttpPath.'" '.$attr.'>';
     return $html;
 }
 
-function draw_noimge($extraParam = array()) {
+/**
+ * Draw image
+ * @param array $extraParam
+ * @return string
+*/
+function drawNoimge($extraParam = array()) {
     $html = '';
-    $attr = get_attributes($extraParam);
+    $attr = getAttributes($extraParam);
     $imgSrcPath = DIR_WS_IMAGES_COMMON.'no_preview.jpg';
     $imgHttpPath = DIR_HTTP_IMAGES_COMMON.'no_preview.jpg';
     
@@ -252,7 +296,11 @@ function draw_noimge($extraParam = array()) {
     return $html;
 }
 
-function get_available_actions() {
+/**
+ * Get available menu actions for validation
+ * @return array
+*/
+function getAvailableActions() {
     $returnArr = array();
 
     $objUtilMaster = new UtilMaster();
@@ -265,6 +313,22 @@ function get_available_actions() {
         $returnArr[constant($value['constant_name'])] = '';
     }
     return $returnArr;
+}
+
+/**
+ * Sync form data with table data
+ * @param array $formData
+ * @return array
+*/
+function syncPostData($formData) {
+    if(empty($_POST)) { return $formData; }
+    $postData = $_POST;
+    foreach ($postData as $key => $value) {
+        if(isset($postData[$key])) {
+            $formData[$key] = $value;
+        }
+    }
+    return $formData;
 }
 
 ?>

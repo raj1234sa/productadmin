@@ -5,15 +5,15 @@ require_once(DIR_WS_MODEL.'SiteLanguageMaster.php');
 
 $siteLanguageMaster = new SiteLanguageMaster();
 
-$listing_data = postValue('listing_data');
+$listingData = postValue('listing_data');
 $export = requestValue('export');
 $action = requestValue('action');
 
 if($action == 'change_status') {
-    $status_code = postValue('status_code');
+    $statusCode = postValue('status_code');
     $status = postValue('status');
     $id = postValue('id');
-    if(strpos($status_code, 'status') !== FALSE) {
+    if(strpos($statusCode, 'status') !== FALSE) {
         $siteLanguageData = new SiteLanguageData();
         $siteLanguageData->status = ($status == '1') ? '1' : '0';
         $siteLanguageData->language_id = $id;
@@ -23,8 +23,8 @@ if($action == 'change_status') {
     exit;
 }
 
-if($isAjaxRequest && ($listing_data || $export)) {
-    extract(extract_search_fields(), EXTR_PREFIX_ALL, 'SC');
+if($isAjaxRequest && ($listingData || $export)) {
+    extract(extractSearchFields(), EXTR_PREFIX_ALL, 'SC');
 
     $siteLanguageMaster->setLimit($SC_start, $SC_length);
     if(!empty($SC_column)) {
@@ -38,15 +38,15 @@ if($isAjaxRequest && ($listing_data || $export)) {
 
     if($export) {
         $siteLanguages = objectToArray($siteLanguages);
-        $export_structure = array();
-        $export_structure[] = array('language_id'=>array('name'=>'language_id', 'title'=>COMMON_LANGUAGE_ID));
-        $export_structure[] = array('language_name'=>array('name'=>'language_name', 'title'=>COMMON_LANGUAGE_NAME));
-        $export_structure[] = array('status'=>array('name'=>'status', 'title'=>COMMON_STATUS));
+        $exportStructure = array();
+        $exportStructure[] = array('language_id'=>array('name'=>'language_id', 'title'=>COMMON_LANGUAGE_ID));
+        $exportStructure[] = array('language_name'=>array('name'=>'language_name', 'title'=>COMMON_LANGUAGE_NAME));
+        $exportStructure[] = array('status'=>array('name'=>'status', 'title'=>COMMON_STATUS));
 
         $sheetTitle = $pageTitle;
         $headerDate = "All";
-        $spreadsheet = export_file_generate($export_structure, $siteLanguages);
-        echo json_encode(export_report($spreadsheet, 'export_languages.xlsx'));
+        $spreadsheet = exportFileGenerate($exportStructure, $siteLanguages);
+        echo json_encode(exportReport($spreadsheet));
         exit;
     }
 
@@ -57,31 +57,31 @@ if($isAjaxRequest && ($listing_data || $export)) {
         $sr = $SC_start + 1;
         foreach ($siteLanguages as $lang) {
             $rec = array();
-            $flag_name = (!empty($lang['language_flag'])) ? $lang['language_flag'] : '';
-            if(!empty($flag_name)) {
-                $http_path = DIR_HTTP_IMAGES_FLAGS.$flag_name;
-                $src_path = DIR_WS_IMAGES_FLAGS.$flag_name;
+            $flagName = (!empty($lang['language_flag'])) ? $lang['language_flag'] : '';
+            if(!empty($flagName)) {
+                $httpPath = DIR_HTTP_IMAGES_FLAGS.$flagName;
+                $srcPath = DIR_WS_IMAGES_FLAGS.$flagName;
             }
             $rec['DT_RowId'] = "language:".$lang['language_id'];
             $rec['language_id'] = $sr++;
             $rec['language_name'] = $lang['language_name'];
-            if(!empty($http_path)) {
-                $rec['language_name'] .= draw_imge($http_path, $src_path, array('width'=>30, 'class'=>'ml-2'));
+            if(!empty($httpPath)) {
+                $rec['language_name'] .= drawImge($httpPath, $srcPath, array('width'=>30, 'class'=>'ml-2'));
             }
-            $rec['status'] = form_switchbutton('status'.$lang['language_id'], $lang['status'], array('element_class'=>'ajax change_status'));
-            // $rec[] = form_switchbutton('status', $state['status'], array('class'=>'ajax change_status'));
-            // $action_buttons = array();
-            // $action_buttons[COMMON_EDIT] = array(
+            $rec['status'] = formSwitchbutton('status'.$lang['language_id'], $lang['status'], array('element_class'=>'ajax change_status'));
+            // $rec[] = formSwitchbutton('status', $state['status'], array('class'=>'ajax change_status'));
+            // $actionButtons = array();
+            // $actionButtons[COMMON_EDIT] = array(
             //     'link' => DIR_HTTP_ADMIN.ADMIN_FILE_CITY_EDIT.'?city_id='.$state['city_id'],
             //     'icon' => 'far fa-edit',
             // );
-            // $action_buttons[COMMON_DELETE] = array(
+            // $actionButtons[COMMON_DELETE] = array(
             //     'link' => DIR_HTTP_ADMIN.ADMIN_FILE_CITIES.'?action=delete&city_id='.$state['city_id'],
             //     'icon' => 'far fa-trash-alt',
             //     'class' => 'label-danger ajax delete',
             //     'compact_class' => 'btn-danger ajax delete',
             // );
-            // $rec[] = draw_action_menu($action_buttons);
+            // $rec[] = drawActionMenu($actionButtons);
             $allRecs[] = $rec;
         }
     }
@@ -103,8 +103,8 @@ $breadcrumbArr = array(
     ),
 );
 
-$action_buttons = array();
-// $action_buttons[COMMON_ADD_LANGUAGE] = array(
+$actionButtons = array();
+// $actionButtons[COMMON_ADD_LANGUAGE] = array(
 //     'class' => 'btn btn-success',
 //     'link' => DIR_HTTP_ADMIN.FILE_ADMIN_LANGUAGE_EDIT,
 //     'icon' => 'fa fa-plus',

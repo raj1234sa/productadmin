@@ -1,5 +1,5 @@
 <?php
-    echo draw_action_buttons($action_buttons);
+    echo drawActionButtons($actionButtons);
 ?>
 <div class="table-responsive datatable-dark">
     <table class="table table-bordered" id="dataTable">
@@ -18,6 +18,7 @@ $globalJs .= <<<JS
     $("#dataTable").PATable({
         tabletools: true,
         tablebuttons: ['print', 'export'],
+        serverSide: true,
         search: {
             form: '#frm',
             button: '#btn',

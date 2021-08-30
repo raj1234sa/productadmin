@@ -8,21 +8,21 @@ $err = array();
 
 $submit = postValue('admin_login');
 if($submit == 'yes') {
-    $admin_username = postValue('admin_username');
-    $admin_password = md5(postValue('admin_password'));
+    $adminUsername = postValue('admin_username');
+    $adminPassword = md5(postValue('admin_password'));
     $backurl = postValue('backurl');
 
-    $adminMaster->setWhere("AND admin_username = :admin_username", $admin_username, 'string');
-    $adminMaster->setWhere("AND admin_password = :admin_password", $admin_password, 'string');
+    $adminMaster->setWhere("AND admin_username = :admin_username", $adminUsername, 'string');
+    $adminMaster->setWhere("AND admin_password = :admin_password", $adminPassword, 'string');
     $adminData = $adminMaster->getAdmin();
 
     if(!empty($adminData)) {
-        addSession('_ses_admin_login_id', $adminData[0]['admin_id']);
+        setSession('_ses_admin_login_id', $adminData[0]['admin_id']);
         if(!empty($backurl)) {
-            $backurl = str_replace(HOSTNAME_URL.'/', HOSTNAME_URL, $backurl);
-            show_page_header($backurl);
+            // $backurl = str_replace(HOSTNAME_URL.'/', HOSTNAME_URL, $backurl);
+            showPageHeader($backurl);
         } else {
-            show_page_header(FILE_ADMIN_WELCOME);
+            showPageHeader(FILE_ADMIN_WELCOME);
         }
     } else {
         $err['username'] = COMMON_LOGIN_ERROR;

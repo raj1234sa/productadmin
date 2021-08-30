@@ -4,7 +4,7 @@ if(!isset($_SESSION['admin_session'])) {
     $_SESSION['admin_session'] = serialize(array());
 }
 
-function addSession($name, $value) {
+function setSession($name, $value) {
     $adminSession = unserialize($_SESSION['admin_session']);
     $adminSession[$name] = $value;
     $_SESSION['admin_session'] = serialize($adminSession);
@@ -40,7 +40,7 @@ if(!empty($adminId)) {
     }
 } elseif(FILE_FILENAME_WITHOUT_EXT != '' && FILE_FILENAME_WITHOUT_EXT != 'index') {
     $backurl = urlencode(HOSTNAME_URL.$_SERVER['PHP_SELF']);
-    show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_LOGIN.'?backurl='.$backurl);
+    showPageHeader(DIR_HTTP_ADMIN.FILE_ADMIN_LOGIN.'?backurl='.$backurl);
 }
 
 ?>

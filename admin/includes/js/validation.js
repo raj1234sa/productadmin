@@ -8,14 +8,18 @@ $(document).ready(function () {
     $.validator.addMethod("phone", function(value, element) {
         return this.optional(element) || phone_regex.test(value);
     });
-
-    $('form').find('input, select, textarea').each(function () {
+});
+$.fn.paValidate = function() {
+    $(this).validate({ignore: ".ignore"});
+    $(this).find('input:text, input:password, select, textarea').each(function () {
         let element = $(this);
         if (element.data('validation-required') !== undefined) {
             if(element.hasClass('date-picker')) {
                 element.children("div[class*=col-]").children('.input-group').append(COMMON_REQUIRED_RED_STAR);
             } else {
-                element.after(COMMON_REQUIRED_RED_STAR);
+                if(!element.parent().html().includes(COMMON_REQUIRED_RED_STAR)) {
+                    element.after(COMMON_REQUIRED_RED_STAR);
+                }
             }
         }
 
@@ -142,4 +146,4 @@ $(document).ready(function () {
             });
         }
     });
-});
+};

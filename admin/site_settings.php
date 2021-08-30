@@ -27,8 +27,8 @@ if(!empty($submit)) {
             $objSiteSettingsData->set_value = $settingValue;
             $objSiteSettingsMaster->editSiteSetting($objSiteSettingsData);
         }
-        set_flash_message(COMMON_UPDATE_SUCCESS, 'success');
-        show_page_header(DIR_HTTP_ADMIN.FILE_ADMIN_SITE_SETTINGS_LISTING);
+        setFlashMessage(COMMON_UPDATE_SUCCESS, 'success');
+        showPageHeader(DIR_HTTP_ADMIN.FILE_ADMIN_SITE_SETTINGS_LISTING);
     }
 }
 
